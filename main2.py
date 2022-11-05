@@ -44,26 +44,6 @@ reaction18 = '<:RzOhDear:1037385011499896964>'
 conn = sqlite3.connect('db_tags.db')
 c = conn.cursor()
 
-async def get_gif_data():
-    """Get a guild's leaderboard data"""
-    #database = conn.tag_db
-    #gif_table = os.environ.get("gif_table")
-    selection = "*"
-
-    data = await c.fetch_all(
-        f"""
-        SELECT   name, gif
-        FROM     gif_table
-        WHERE    name = :name
-        ORDER BY name
-        DESC
-        """,
-        {"name": selection},
-    )
-
-    guild_data = [dict(row) for row in data]
-    return guild_data
-
 def fail():
     1/0
 
