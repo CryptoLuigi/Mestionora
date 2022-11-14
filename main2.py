@@ -123,6 +123,8 @@ async def on_application_command_error(inter: nextcord.Interaction, error):
     error = getattr(error, "original", error)
     if isinstance(error, CallableOnCooldown):
         await inter.send(ephemeral=True, content=f"You are being rate-limited! Retry in `{error.retry_after}` seconds.")
+    elif isinstance(error, application_checks):
+        await inter.send(ephemeral=True, content=f"You do not have permission to do that.")           
     else:
         raise error
 
@@ -270,31 +272,8 @@ async def on_raw_reaction_add(payload):
     if message.author == client.user:
         return  
 
-    value = random.randint(1,26)
-    if value == 12 or value == 26:
-        await message.add_reaction(payload.emoji)
-        print('Mestionora added a reaction'.format(client))    
-
-    if payload.emoji.name=="Benno_lol":
-        value = random.randint(1,3)
-        if value == 1:
-            await message.add_reaction(reaction13)
-            print('Mestionora added a reaction'.format(client))
-
-    if payload.emoji.name=="MyneSparkle":
-        value = random.randint(1,3)
-        if value == 1:
-            await message.add_reaction(reaction14)
-            print('Mestionora added a reaction'.format(client))   
-
-    if payload.emoji.name=="MyneBliss":
-        value = random.randint(1,3)
-        if value == 1:
-            await message.add_reaction(reaction15)
-            print('Mestionora added a reaction'.format(client))   
-
     if payload.emoji.name=="MyneRofl":
-        value = random.randint(1,3)
+        value = random.randint(1,300)
         if value == 1:
             await message.add_reaction(reaction16)
             print('Mestionora added a reaction'.format(client))   
@@ -305,86 +284,6 @@ async def on_message(message):
     banchannel = f"bots"
     if message.author == client.user:
         return
-
-    if message.author.id == 623589474940747819:
-        value = random.randint(1,1000)
-        print(value)
-        if value == 47:
-            await message.add_reaction(reaction17)
-            print('Mestionora added a reaction'.format(client))           
-
-    if "I'll show it support " in message.content.lower():
-        await message.add_reaction(reaction18)
-        print('Mestionora added a reaction'.format(client))  
-
-    if "speedreader" in message.content.lower():
-        await message.add_reaction(reaction18)
-        print('Mestionora added a reaction'.format(client))  
-
-
-    if "drama cd" in message.content.lower():
-        value = random.randint(1,5)
-        if value == 3:
-            await message.add_reaction(reaction8)
-            print('Mestionora added a reaction'.format(client))  
-
-    if "lessy" in message.content.lower():
-        value = random.randint(1,4)
-        if value == 2:
-            await message.add_reaction(reaction12)
-            print('Mestionora added a reaction'.format(client))  
-
-    if "puhi" in message.content.lower():
-        value = random.randint(1,4)
-        if value == 3:
-            await message.add_reaction(reaction11)
-            print('Mestionora added a reaction'.format(client))  
-
-    if "schwartz" in message.content.lower():
-        value = random.randint(1,6)
-        print(value)
-        if value == 2:
-            await message.add_reaction(reaction9)        
-            print('Mestionora added a reaction'.format(client)) 
- 
-    if "weiss" in message.content.lower():
-        value = random.randint(1,6)
-        print(value)
-        if value == 2:
-            await message.add_reaction(reaction10)        
-            print('Mestionora added a reaction'.format(client)) 
-
-    if "shumil emperor" in message.content.lower():
-        value = random.randint(1,6)
-        print(value)
-        if value == 2:
-            await message.add_reaction(reaction9)        
-            print('Mestionora added a reaction'.format(client)) 
-        elif value == 1:
-            await message.add_reaction(reaction10)        
-            print('Mestionora added a reaction'.format(client)) 
-
-    if "meteor" in message.content.lower():
-        value = random.randint(1,6)
-        print(value)
-        if value == 2:
-            await message.add_reaction(reaction5)        
-            print('Mestionora added a reaction'.format(client)) 
-
-    if 'mestionora' in message.content.lower():
-        value = random.randint(1,16)
-        if value == 1:
-            await message.add_reaction(reaction1)
-            print('Mestionora added a reaction'.format(client)) 
-        elif value == 2:
-            await message.add_reaction(reaction2)
-            print('Mestionora added a reaction'.format(client)) 
-        elif value == 3:
-            await message.add_reaction(reaction3)
-            print('Mestionora added a reaction'.format(client))             
-        elif value == 4:
-            await message.add_reaction(reaction4)
-            print('Mestionora added a reaction'.format(client)) 
     
     print(f"{message.channel}")
 
@@ -413,20 +312,6 @@ async def on_message(message):
                 if value == 8:
                     await message.channel.send('https://media.discordapp.net/attachments/1029782845071294595/1030838628710088785/11.jpg')
 
-        except cooldowns.CallableOnCooldown:
-            print(f'cooldown')
-
-    if message.content.startswith('Are the subs done?'):
-        try:               
-            async with cooldown(message):
-                await message.channel.send('You must wait my child.')
-        except cooldowns.CallableOnCooldown:
-            print(f'cooldown')
-
-    if message.content.startswith('I hate books'):
-        try:               
-            async with cooldown(message):
-                await message.channel.send('You are cursed for 10 generations.')
         except cooldowns.CallableOnCooldown:
             print(f'cooldown')
 
