@@ -1,7 +1,7 @@
 import cooldowns, random , nextcord, sqlite3, calendar, os
 from enum import Enum
 from nextcord import Intents, Interaction, Member, Embed, Message, ButtonStyle
-from nextcord.ext import application_checks
+from nextcord.ext import application_checks, commands
 from cooldowns import CallableOnCooldown, Cooldown, SlashBucket
 from datetime import datetime
 from typing import Optional
@@ -15,7 +15,8 @@ c = conn.cursor()
 
 intents = Intents.all()
 intents.message_content = True
-client = nextcord.Client(intents=intents)
+
+client = commands.Bot(command_prefix='!', help_command=None, intents=intents)
 
 ServerID = 883777134282293258
 ServerID2 = 630606651992309760
