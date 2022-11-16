@@ -81,6 +81,8 @@ async def on_member_join(member):
         embed=Embed(title=f"Welcome!", description=f"{member.mention}, welcome to Chibi's Library 📚.\nCheck out <#1029192039293792377> to get roles.", type="image",color=0xf1c40f)
         embed.set_image("https://cdn.discordapp.com/attachments/946041447348596747/1029832048522821723/image.png?size=4096")
         await channel.send(embed=embed)
+        bookwormrole = nextcord.utils.get(servercheck.roles, name="Bookworms 📚")
+        await member.add_roles(bookwormrole)
 
 #    channel = client.get_channel(ChannelID2)
 #    allowedserver = client.get_guild(ServerID2)
