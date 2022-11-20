@@ -49,10 +49,7 @@ async def list_bots(interaction):
         for member in members:
             if member.mention != "<@420692327019839504>": #ignore the server owner
                 contentmsg += f"• {member.mention}\n"
-
-        embed=Embed(title="Bots", description=f"{contentmsg}",color=0xf1c40f)
-        embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/1027597999091753010/1029853959122325554/f9c0b03d3186867d4196e15dd8828606.png")
-        await interaction.response.send_message(embed=embed)
+        await interaction.response.send_message(contentmsg)
         print(f"{interaction.user} requested the bot list")
     else:
         await interaction.response.send_message(ephemeral=True, content=f"{interaction.user.mention} This can only be used in {botchannel}!")
