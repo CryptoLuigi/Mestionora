@@ -79,7 +79,11 @@ async def on_member_join(member):
         embed.set_image("https://cdn.discordapp.com/attachments/946041447348596747/1029832048522821723/image.png?size=4096")
         await channel.send(embed=embed)
         bookwormrole = nextcord.utils.get(servercheck.roles, name="Bookworms 📚")
-        await member.add_roles(bookwormrole)
+        botsrole = nextcord.utils.get(servercheck.roles, name="Bots")
+        if member.bot:
+            await member.add_roles(botsrole)
+        else:
+            await member.add_roles(bookwormrole)
 
 #    channel = client.get_channel(ChannelID2)
 #    allowedserver = client.get_guild(ServerID2)
