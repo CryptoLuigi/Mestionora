@@ -84,11 +84,11 @@ async def on_member_join(member):
         bookwormrole = nextcord.utils.get(servercheck.roles, name="Bookworms 📚")
         await member.add_roles(bookwormrole)
 
-#    channel = client.get_channel(ChannelID2)
-#    allowedserver = client.get_guild(ServerID2)
-#    if f'{servercheck}' == f'{allowedserver}':
-#        embed=nextcord.Embed(title="Welcome!",description=f"{member.mention} welcome to **Ascendance of a Bookworm!** Be sure to check our {welcomechannel}! Feel free to introduce yourself in {introchannel} and get a role in {rolechannel} <:MyneSparkle:1018941182430154902>",color=0xf1c40f)
-#        await channel.send(embed=embed)
+    channel = client.get_channel(ChannelID2)
+    allowedserver = client.get_guild(ServerID2)
+    if f'{servercheck}' == f'{allowedserver}':
+        embed=nextcord.Embed(title="Welcome!",description=f"{member.mention} welcome to **Ascendance of a Bookworm!** Be sure to check our {welcomechannel}! Feel free to introduce yourself in {introchannel} and get a role in {rolechannel} <:MyneSparkle:1018941182430154902>",color=0xf1c40f)
+        await channel.send(embed=embed)
 
 
 # Start up message
@@ -201,6 +201,7 @@ async def superrm(interaction : Interaction, name:str):
 
         async def confirm_callback1(interaction:Interaction):
             c.execute(f"DELETE FROM tags WHERE tags . NAME = '{name}'")
+            conn.commit()
             await interaction.response.send_message(ephemeral=True, content=f"Tag \"{name}\" has been removed.") 
             print('Mestionora deleted from the db'.format(client))
 
@@ -226,7 +227,7 @@ async def sedit(interaction : Interaction, name:str):
         tagn = c.fetchone()
         c.execute(f"SELECT LINK from tags where NAME = '{name}'")
         msg = c.fetchone()
-        msg = msg.replace("\\n","\n")
+        msg = msg[0].replace("\\n","\n")
         await interaction.response.send_modal(TagModal("edit",msg[0],tagn[0]))
 
 # Change user id in database: /sgive <name> <member>
@@ -268,11 +269,11 @@ async def edit(interaction : Interaction, name:str):
         tagn = c.fetchone()
         c.execute(f"SELECT LINK from tags where NAME = '{name}'")
         msg = c.fetchone()
-        msg = msg.replace("\\n","\n")
-        await interaction.response.send_modal(TagModal("edit",msg[0],tagn))
+        msg = msg[0].replace("\\n","\n")
+        await interaction.response.send_modal(TagModal("edit",msg[0],tagn[0]))
     elif user_check == "None":
         await interaction.response.send_message(ephemeral=True, content=f"Tag \"{name}\" does not exist.")
-    else:
+    else:   
         await interaction.response.send_message(ephemeral=True, content=f"Tag \"{name}\" is created by someone else.")
 
 @client.slash_command(description="Remove a tag")
@@ -284,6 +285,7 @@ async def rm(interaction : Interaction, name:str):
 
         async def confirm_callback1(interaction:Interaction):
             c.execute(f"DELETE FROM tags WHERE tags . NAME = '{name}'")
+            conn.commit()
             await interaction.response.send_message(ephemeral=True, content=f"Tag \"{name}\" has been removed.") 
             print('Mestionora deleted from the db'.format(client))
 
