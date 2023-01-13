@@ -126,7 +126,7 @@ async def get_page_giflist(client,interaction,page:int) -> None:
     for data in gif_data[(((page*10)-10)):(10+((page*10)-10))]:
         c.execute(f"SELECT name from gif_table where id = '{data[0]}'")
         name_entry = c.fetchone()
-        c.execute(f"SELECT gif FROM gif_table WHERE id = '{data[0]'")
+        c.execute(f"SELECT gif FROM gif_table WHERE id = '{data[0]}'")
         gif_link = c.fetchone()
         gif_list_content += f"{data[0]} • **{name_entry[0]}** • [link]({gif_link[0]})\n"
 
