@@ -68,6 +68,7 @@ class TagModal(Modal):
                 return await interaction.response.send_message(ephemeral=True, content=f"Tag \"{tagn}\" got their content and tag name edited.\n__**New Tag Name:**__ {name}\n__**Preview:**__\n{text}")
         else:
             return await interaction.response.send_message("**Error:** `usemode` is incorrect.\n\nIf you're reading this, please report this to the devs.")
+        return 0
 
 class SetPage(Modal):
     def __init__(self):
@@ -125,7 +126,9 @@ async def get_page_giflist(client,interaction,page:int) -> None:
     for data in gif_data[(((page*10)-10)):(10+((page*10)-10))]:
         c.execute(f"SELECT name from gif_table where id = '{data[0]}'")
         name_entry = c.fetchone()
-        gif_list_content += f"{data[0]} • **{name_entry[0]}**\n"
+        c.execute(f"SELECT gif FROM gif_table WHERE id = '{data[0]'")
+        gif_link = c.fetchone()
+        gif_list_content += f"{data[0]} • **{name_entry[0]}** • [link]({gif_link[0]})\n"
 
     embed = Embed(title=f"List of gifs", description=f"{gif_list_content}",color=0xf1c40f)
     embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/1027597999091753010/1029853959122325554/f9c0b03d3186867d4196e15dd8828606.png")
