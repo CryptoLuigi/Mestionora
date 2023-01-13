@@ -128,7 +128,7 @@ async def get_page_giflist(client,interaction,page:int) -> None:
         name_entry = c.fetchone()
         c.execute(f"SELECT gif FROM gif_table WHERE id = '{data[0]}'")
         gif_link = c.fetchone()
-        gif_list_content += f"{data[0]} • **{name_entry[0]}** • [link]({gif_link[0]})\n"
+        gif_list_content += f"{data[0]} • **{name_entry[0]}** • [View Gif]({gif_link[0]})\n"
 
     embed = Embed(title=f"List of gifs", description=f"{gif_list_content}",color=0xf1c40f)
     embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/1027597999091753010/1029853959122325554/f9c0b03d3186867d4196e15dd8828606.png")
