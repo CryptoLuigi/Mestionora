@@ -229,7 +229,7 @@ async def sedit(interaction : Interaction, name:str):
         c.execute(f"SELECT LINK from tags where NAME = '{name}'")
         msg = c.fetchone()
         msg = msg[0].replace("\\n","\n")
-        await interaction.response.send_modal(TagModal("edit",msg[0],tagn[0]))
+        await interaction.response.send_modal(TagModal("edit",msg,tagn[0]))
 
 # Change user id in database: /sgive <name> <member>
 @client.slash_command(description="Admin command to give tags")
@@ -271,7 +271,7 @@ async def edit(interaction : Interaction, name:str):
         c.execute(f"SELECT LINK from tags where NAME = '{name}'")
         msg = c.fetchone()
         msg = msg[0].replace("\\n","\n")
-        await interaction.response.send_modal(TagModal("edit",msg[0],tagn[0]))
+        await interaction.response.send_modal(TagModal("edit",msg,tagn[0]))
     elif user_check == "None":
         await interaction.response.send_message(ephemeral=True, content=f"Tag \"{name}\" does not exist.")
     else:   
