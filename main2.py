@@ -43,11 +43,9 @@ async def list_bots(interaction):
     current_channel = f"{interaction.channel}"
     if current_channel == f'bots' or current_channel ==f'🐍-bots':
         guild = nextcord.utils.find(lambda g: g.id == interaction.guild.id, client.guilds)
-        role = nextcord.utils.get(guild.roles, name="Bots")
-        members = role.members
         contentmsg = "This is the list of bots in the *Ascendance of a Bookworm* discord server:\n\n"
-        for member in members:
-            if member.mention != "<@420692327019839504>": #ignore the server owner
+        for member in guild.members:
+            if member.bot
                 contentmsg += f"• {member.mention}\n"
         await interaction.response.send_message(contentmsg)
         print(f"{interaction.user} requested the bot list")
