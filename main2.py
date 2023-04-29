@@ -83,8 +83,7 @@ async def on_member_join(member):
     channel = client.get_channel(ChannelID2)
     allowedserver = client.get_guild(ServerID2)
     if f'{servercheck}' == f'{allowedserver}':
-        embed=nextcord.Embed(title="Welcome!",description=f"{member.mention} welcome to **Ascendance of a Bookworm!** Be sure to check our {welcomechannel}! Feel free to introduce yourself in {introchannel} and get a role in {rolechannel} <:MyneSparkle:1018941182430154902>",color=0xf1c40f)
-        await channel.send(embed=embed)
+        await channel.send(f"Welcome! {member.mention} welcome to **Ascendance of a Bookworm!** Be sure to check our {welcomechannel}! Feel free to introduce yourself in {introchannel} and get a role in {rolechannel} <:MyneSparkle:1018941182430154902>")
 
 
 # Start up message
