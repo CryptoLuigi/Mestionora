@@ -27,14 +27,14 @@ introchannel  = f'<#721199596084396063>'
 botchannel = f'<#638020706935767100>'
 rolechannel = f'<#637097683030638624>'
 
-@client.message_command(name="Convert to fxtwitter")
-async def conv_fxtwitter(interaction: Interaction, message: Message):
+@client.message_command(name="Convert to vxtwitter")
+async def conv_vxtwitter(interaction: Interaction, message: Message):
     msg = message.content
     x = msg.find("https://twitter.com/")
     if x == -1:
         await interaction.response.send_message("Nothing to convert", ephemeral=True)
     else:
-        msg = msg.replace("https://twitter.com/","https://fxtwitter.com/")
+        msg = msg.replace("https://twitter.com/","https://vxtwitter.com/")
         await interaction.response.send_message(f"{msg}", ephemeral=True)
 
 @client.slash_command(description="Fetch the list of bots on the server.")
