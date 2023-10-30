@@ -132,16 +132,14 @@ async def mynetime(interaction : Interaction):
         fixedtime = datetime.datetime(addedtime.year, addedtime.month, addedtime.day, hour=16, tzinfo=addedtime.tzinfo)
     timestamp = f"<t:{int(fixedtime.timestamp())}:R>"
     embed = nextcord.Embed(title="Myneday", description=f"Next prepub {timestamp} on {timestamp.replace(':R','')}.", color=random.randint(0x0, 0xffffff))
+    myneday_gifs = (
+        "https://cdn.discordapp.com/attachments/1051224405688197130/1107797923753902150/ascendence-of-a-bookworm-bookworm-monday.gif",
+        "https://cdn.discordapp.com/attachments/1003970211692695642/1110114383708823572/Its_myneday.gif",
+        "https://cdn.discordapp.com/attachments/630607287660314634/1168523436331638784/giphy1.gif?ex=65521341&is=653f9e41&hm=93aad3ae52d7cab17d19dbb1e233028de553066039706aa8323a3641c38b02c0&",
+        "https://cdn.discordapp.com/attachments/1003970211692695642/1097360326317592667/giphy-1.gif",
+    )
     if weekday == 0:
-        randimg = random.randint(0,3)
-        if randimg == 0
-            embed.set_image('https://cdn.discordapp.com/attachments/1051224405688197130/1107797923753902150/ascendence-of-a-bookworm-bookworm-monday.gif')
-        elif randimg == 1
-            embed.set_image('https://cdn.discordapp.com/attachments/1003970211692695642/1110114383708823572/Its_myneday.gif')
-        elif randimg == 2
-            embed.set_image('https://cdn.discordapp.com/attachments/630607287660314634/1168523436331638784/giphy1.gif?ex=65521341&is=653f9e41&hm=93aad3ae52d7cab17d19dbb1e233028de553066039706aa8323a3641c38b02c0&')
-        elif randimg == 3
-            embed.set_image('https://cdn.discordapp.com/attachments/1003970211692695642/1097360326317592667/giphy-1.gif')
+        embed.set_image(random.choice(myneday_gifs))
     else:
         embed.set_image('https://cdn.discordapp.com/attachments/1051224405688197130/1107797980179857499/ascendence-of-a-bookworm-bookworm-anime.gif')
     await interaction.response.send_message(embed=embed)
@@ -235,7 +233,12 @@ async def superrm(interaction : Interaction, name:str):
         confirm_delete1.callback = confirm_callback1
 
         view = nextcord.ui.View(timeout=180)
-        view.add_item(confirm_delete1)
+        view.add_item(confirm_delete1)myneday_gifs = [
+    "https://cdn.discordapp.com/attachments/1051224405688197130/1107797923753902150/ascendence-of-a-bookworm-bookworm-monday.gif",
+    "https://cdn.discordapp.com/attachments/1003970211692695642/1110114383708823572/Its_myneday.gif",
+    "https://cdn.discordapp.com/attachments/630607287660314634/1168523436331638784/giphy1.gif?ex=65521341&is=653f9e41&hm=93aad3ae52d7cab17d19dbb1e233028de553066039706aa8323a3641c38b02c0&",
+    "https://cdn.discordapp.com/attachments/1003970211692695642/1097360326317592667/giphy-1.gif",
+]
 
         embed=Embed(title="Confirm removal", description=f"Are you sure you want to remove tag \"{name}\"?",color=0xf1c40f)
 
