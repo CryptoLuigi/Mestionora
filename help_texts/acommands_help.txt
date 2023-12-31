@@ -1,0 +1,10 @@
+</sedit:0> `name` `text` - Allows edition of any existing tag (regardless of the creator).
+`name` = The name of the tag you want to edit.
+`text` = Content you want to store in the tag.
+
+</superrm:0> `name` - Allows removal of any existing tag (regardless of the creator).
+`name` = The name of the tag you want to remove.
+
+</sgive:0> `name` `member` - Allows to change the owner of a tag (regardless of the creator).
+`name` = The name of the tag you want to change owner.
+`member` = The user you want to set as the owner.
