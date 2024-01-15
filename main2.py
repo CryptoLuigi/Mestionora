@@ -763,7 +763,7 @@ async def join_club(interaction: Interaction, name: str):
         if not club:
             return await interaction.response.send_message(
                 ephemeral=True, 
-                f"Club {name} does not exist",
+                content=f"Club {name} does not exist",
             )
 
         if interaction.user.id in {member.user_id for member in club.members}:
