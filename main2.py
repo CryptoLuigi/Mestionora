@@ -148,7 +148,6 @@ async def mynetime(interaction : Interaction):
         myne_time = jnovel_time + datetime.timedelta(days=7 - jnovel_time.weekday())
         myne_time = jnovel_tz.localize(
             datetime.datetime(myne_time.year, myne_time.month, myne_time.day, myne_hour)
-        )
     else:
         myne_time = jnovel_time
 
