@@ -44,7 +44,7 @@ async def list_bots(interaction):
         guild = nextcord.utils.find(lambda g: g.id == interaction.guild.id, client.guilds)
         contentmsg = "This is the list of bots in the *Ascendance of a Bookworm* discord server:\n\n"
         for member in guild.members:
-            if member.bot
+            if member.bot:
                 contentmsg += f"• {member.mention}\n"
         await interaction.response.send_message(contentmsg)
         print(f"{interaction.user} requested the bot list")
