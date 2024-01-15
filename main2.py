@@ -825,37 +825,73 @@ async def leave_club(interaction: Interaction, name: str):
 
 @client.slash_command(description="List all clubs in a server")
 async def list_clubs(interaction: Interaction):
+    current_channel = f"{interaction.channel}"
+    if current_channel == f"bots" or current_channel == f"🐍-bots":
     """List all clubs in the server."""
-    if interaction.guild is None or interaction.channel is None:
-        return await interaction.response.send_message(
-            ephemeral=True,
-            content="This command must be used in a server.",
-        )
-
-    with Session.begin() as session:
-        clubs = (
-            session.execute(
-                sa.select(Club).filter(Club.guild_id == interaction.guild.id)
-            )
-            .scalars()
-            .all()
-        )
-
-        if not clubs:
-            description = f"There are no clubs in {interaction.guild.name}."
-        else:
-            description = f"List of the clubs in {interaction.guild.name}:\n"
-            description += "\n".join(
-                f"{i+1}. `{club.name}` ({len(club.members)} members)"
-                for i, club in enumerate(clubs)
+        if interaction.guild is None or interaction.channel is None:
+            return await interaction.response.send_message(
+                ephemeral=True,
+                content="This command must be used in a server.",
             )
 
-        embed = Embed(
-            title="Clubs",
-            description=description,
-            color=0xF1C40F,
-        )
-        await interaction.response.send_message(embed=embed)
+        with Session.begin() as session:
+            clubs = (
+                session.execute(
+                    sa.select(Club).filter(Club.guild_id == interaction.guild.id)
+                )
+                .scalars()
+                .all()
+            )
+
+            if not clubs:
+                description = f"There are no clubs in {interaction.guild.name}."
+            else:
+                description = f"List of the clubs in {interaction.guild.name}:\n"
+                description += "\n".join(
+                    f"{i+1}. `{club.name}` ({len(club.members)} members)"
+                    for i, club in enumerate(clubs)
+                )
+
+            embed = Embed(
+                title="Clubs",
+                description=description,
+                color=0xF1C40F,
+            )
+            await interaction.response.send_message(embed=embed)
+    else:
+        if interaction.guild is None or interaction.channel is None:
+            return await interaction.response.send_message(
+                ephemeral=True,
+                content="This command must be used in a server.",
+            )
+
+        with Session.begin() as session:
+            clubs = (
+                session.execute(
+                    sa.select(Club).filter(Club.guild_id == interaction.guild.id)
+                )
+                .scalars()
+                .all()
+            )
+
+            if not clubs:
+                description = f"There are no clubs in {interaction.guild.name}."
+            else:
+                description = f"List of the clubs in {interaction.guild.name}:\n"
+                description += "\n".join(
+                    f"{i+1}. `{club.name}` ({len(club.members)} members)"
+                    for i, club in enumerate(clubs)
+                )
+
+            embed = Embed(
+                title="Clubs",
+                description=description,
+                color=0xF1C40F,
+            )
+            await interaction.response.send_message(
+                ephemeral=True, 
+                embed=embed,
+            )
 
 
 @client.slash_command(description="Publish to a club")
