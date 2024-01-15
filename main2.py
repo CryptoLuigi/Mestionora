@@ -142,7 +142,7 @@ async def mynetime(interaction : Interaction):
     myne_hour = 16
     jnovel_tz = pytz.timezone("America/Chicago")
     jnovel_time = jnovel_tz.localize(
-        datetime.datetime.utcnow().replace(
+        datetime.datetime.now(tz=jnovel_tz).replace(
             hour=myne_hour, minute=0, second=0, microsecond=0
         )
     )
