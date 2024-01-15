@@ -142,12 +142,12 @@ async def mynetime(interaction : Interaction):
     myne_hour = 16
     jnovel_tz = pytz.timezone("America/Chicago")
     jnovel_time = datetime.datetime.now(tz=jnovel_tz).replace(hour=myne_hour, minute=0, second=0, microsecond=0)
-    )
 
     if jnovel_time.weekday() != 0 or jnovel_time.hour > myne_hour:
         myne_time = jnovel_time + datetime.timedelta(days=7 - jnovel_time.weekday())
         myne_time = jnovel_tz.localize(
             datetime.datetime(myne_time.year, myne_time.month, myne_time.day, myne_hour)
+        )
     else:
         myne_time = jnovel_time
 
