@@ -561,35 +561,35 @@ def is_dst(currenttime):
         return False
 
 #myneday command
-@client.slash_command(description="Print time left for prepub")
-async def mynetime(interaction : Interaction):
-    tz_locale = pytz.timezone("America/Toronto")
-    dst = currenttime = datetime.datetime.now(tz_locale)
-    weekday = currenttime.weekday()
-    addedtime = currenttime + datetime.timedelta(days=7-weekday)
-    if dst:
-        if currenttime.hour <= 17 and weekday == 0:
-            addedtime = currenttime
-    else:
-        if currenttime.hour <= 17 and weekday == 0:
-            addedtime = currenttime
-    fixedtime = datetime.datetime(addedtime.year, addedtime.month, addedtime.day, hour=17, tzinfo=addedtime.tzinfo)
-    if dst:
-        fixedtime = datetime.datetime(addedtime.year, addedtime.month, addedtime.day, hour=17, tzinfo=addedtime.tzinfo)
-    timestamp = f"<t:{int(fixedtime.timestamp())}:R>"
-    embed = nextcord.Embed(title="Myneday", description=f"Next prepub {timestamp} on {timestamp.replace(':R','')}.", color=random.randint(0x0, 0xffffff))
-
-    myneday_gifs = (
-        'https://cdn.discordapp.com/attachments/1051224405688197130/1107797923753902150/ascendence-of-a-bookworm-bookworm-monday.gif',
-        'https://cdn.discordapp.com/attachments/1003970211692695642/1110114383708823572/Its_myneday.gif',
-        'https://cdn.discordapp.com/attachments/630607287660314634/1168523436331638784/giphy1.gif?ex=65521341&is=653f9e41&hm=93aad3ae52d7cab17d19dbb1e233028de553066039706aa8323a3641c38b02c0&',
-        'https://cdn.discordapp.com/attachments/1003970211692695642/1097360326317592667/giphy-1.gif'
-        )
-    if weekday == 0:
-        embed.set_image(random.choice(myneday_gifs))
-    else:
-        embed.set_image('https://cdn.discordapp.com/attachments/1051224405688197130/1107797980179857499/ascendence-of-a-bookworm-bookworm-anime.gif')
-    await interaction.response.send_message(embed=embed)
+#@client.slash_command(description="Print time left for prepub")
+#async def mynetime(interaction : Interaction):
+#    tz_locale = pytz.timezone("America/Toronto")
+#    dst = currenttime = datetime.datetime.now(tz_locale)
+#    weekday = currenttime.weekday()
+#    addedtime = currenttime + datetime.timedelta(days=7-weekday)
+#    if dst:
+#        if currenttime.hour <= 17 and weekday == 0:
+#            addedtime = currenttime
+#    else:
+#        if currenttime.hour <= 17 and weekday == 0:
+#            addedtime = currenttime
+#    fixedtime = datetime.datetime(addedtime.year, addedtime.month, addedtime.day, hour=17, tzinfo=addedtime.tzinfo)
+#    if dst:
+#        fixedtime = datetime.datetime(addedtime.year, addedtime.month, addedtime.day, hour=17, tzinfo=addedtime.tzinfo)
+#    timestamp = f"<t:{int(fixedtime.timestamp())}:R>"
+#    embed = nextcord.Embed(title="Myneday", description=f"Next prepub {timestamp} on {timestamp.replace(':R','')}.", color=random.randint(0x0, 0xffffff))#
+#
+#    myneday_gifs = (
+#        'https://cdn.discordapp.com/attachments/1051224405688197130/1107797923753902150/ascendence-of-a-bookworm-bookworm-monday.gif',
+#        'https://cdn.discordapp.com/attachments/1003970211692695642/1110114383708823572/Its_myneday.gif',
+#        'https://cdn.discordapp.com/attachments/630607287660314634/1168523436331638784/giphy1.gif?ex=65521341&is=653f9e41&hm=93aad3ae52d7cab17d19dbb1e233028de553066039706aa8323a3641c38b02c0&',
+#        'https://cdn.discordapp.com/attachments/1003970211692695642/1097360326317592667/giphy-1.gif'
+#        )
+#    if weekday == 0:
+#        embed.set_image(random.choice(myneday_gifs))
+#    else:
+#        embed.set_image('https://cdn.discordapp.com/attachments/1051224405688197130/1107797980179857499/ascendence-of-a-bookworm-bookworm-anime.gif')
+#    await interaction.response.send_message(embed=embed)
 
 @client.slash_command(description="Print time left for prepub")
 @cooldowns.cooldown(1, 30, bucket=SlashBucket.author)
