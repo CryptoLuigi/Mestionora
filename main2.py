@@ -116,21 +116,23 @@ async def on_application_command_error(inter: Interaction, error):
 #myneday command
 @client.slash_command(description="Print time left for prepub")
 async def mynetime(interaction : Interaction):
-    tz_locale = pytz.timezone("America/Toronto")
-    currenttime = datetime.datetime.now(tz_locale)
-    dst = currenttime > datetime.datetime(currenttime.year, 11, 5, 2, tzinfo=currenttime.tzinfo) or currenttime < datetime.datetime(currenttime.year, 3, 12, 2, tzinfo=currenttime.tzinfo)
-    weekday = currenttime.weekday()
-    addedtime = currenttime + datetime.timedelta(days=7-weekday)
-    if dst:
-        if currenttime.hour <= 16 and weekday == 0:
-            addedtime = currenttime
+    myne_hour = 16
+    jnovel_tz = pytz.timezone("America/Chicago")
+    jnovel_time = jnovel_tz.localize(
+        datetime.datetime.utcnow().replace(
+            hour=myne_hour, minute=0, second=0, microsecond=0
+        )
+    )
+
+    if jnovel_time.weekday() != 0 or jnovel_time.hour > myne_hour:
+        myne_time = jnovel_time + datetime.timedelta(days=7 - jnovel_time.weekday())
+        myne_time = jnovel_tz.localize(
+            datetime.datetime(myne_time.year, myne_time.month, myne_time.day, myne_hour)
+        )
     else:
-        if currenttime.hour <= 17 and weekday == 0:
-            addedtime = currenttime
-    fixedtime = datetime.datetime(addedtime.year, addedtime.month, addedtime.day, hour=17, tzinfo=addedtime.tzinfo)
-    if dst:
-        fixedtime = datetime.datetime(addedtime.year, addedtime.month, addedtime.day, hour=16, tzinfo=addedtime.tzinfo)
-    timestamp = f"<t:{int(fixedtime.timestamp())}:R>"
+        myne_time = jnovel_time
+
+    timestamp = f"<t:{int(myne_time.timestamp())}:R>"
     embed = nextcord.Embed(title="Myneday", description=f"Next prepub {timestamp} on {timestamp.replace(':R','')}.", color=random.randint(0x0, 0xffffff))
 
     myneday_gifs = (
@@ -139,7 +141,8 @@ async def mynetime(interaction : Interaction):
         'https://cdn.discordapp.com/attachments/630607287660314634/1168523436331638784/giphy1.gif?ex=65521341&is=653f9e41&hm=93aad3ae52d7cab17d19dbb1e233028de553066039706aa8323a3641c38b02c0&',
         'https://cdn.discordapp.com/attachments/1003970211692695642/1097360326317592667/giphy-1.gif'
         )
-    if weekday == 0:
+
+    if jnovel_time.weekday() == 0:
         embed.set_image(random.choice(myneday_gifs))
     else:
         embed.set_image('https://cdn.discordapp.com/attachments/1051224405688197130/1107797980179857499/ascendence-of-a-bookworm-bookworm-anime.gif')
