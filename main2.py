@@ -665,7 +665,8 @@ async def create_club(interaction: Interaction, name: str):
 
     if interaction.guild is None or interaction.channel is None:
         return await interaction.response.send_message(
-            "This command must be used in a server."
+            ephemeral=True,
+            content="This command must be used in a server.",
         )
 
     with Session.begin() as session:
@@ -677,7 +678,8 @@ async def create_club(interaction: Interaction, name: str):
 
         if club:
             return await interaction.response.send_message(
-                f"Club {name} already exists"
+                ephemeral=True,
+                content=f"Club {name} already exists",
             )
 
         club = Club(
@@ -686,7 +688,10 @@ async def create_club(interaction: Interaction, name: str):
         club.members.append(ClubMember(user_id=interaction.user.id))
         session.add(club)
 
-    await interaction.response.send_message(f"Created club `{name}`")
+    await interaction.response.send_message(
+        ephemeral=True,
+        content=f"Created club `{name}`",
+    )
 
 
 @client.slash_command(description="Delete a club")
@@ -700,7 +705,8 @@ async def delete_club(interaction: Interaction, name: str):
         or not isinstance(interaction.user, Member)
     ):
         return await interaction.response.send_message(
-            "This command must be used in a server."
+            ephemeral=True,
+            content="This command must be used in a server.",
         )
 
     with Session.begin() as session:
@@ -712,7 +718,8 @@ async def delete_club(interaction: Interaction, name: str):
 
         if not club:
             return await interaction.response.send_message(
-                f"Club {name} does not exist"
+                ephemeral=True, 
+                content=f"Club {name} does not exist",
             )
 
         if (
@@ -720,7 +727,8 @@ async def delete_club(interaction: Interaction, name: str):
             and not interaction.user.guild_permissions.manage_guild
         ):
             return await interaction.response.send_message(
-                f"You are not the creator of the club {name}"
+                ephemeral=True, 
+                content=f"You are not the creator of the club {name}",
             )
 
         for member in club.members:
@@ -728,7 +736,10 @@ async def delete_club(interaction: Interaction, name: str):
 
         session.delete(club)
 
-    await interaction.response.send_message(f"Deleted club {name}")
+    await interaction.response.send_message(
+        ephemeral=True, 
+        content=f"Deleted club {name}",
+    )
 
 
 @client.slash_command(description="Join a club")
@@ -738,7 +749,8 @@ async def join_club(interaction: Interaction, name: str):
 
     if interaction.guild is None or interaction.channel is None:
         return await interaction.response.send_message(
-            "This command must be used in a server."
+            ephemeral=True, 
+            content="This command must be used in a server.",
         )
 
     with Session.begin() as session:
@@ -755,13 +767,16 @@ async def join_club(interaction: Interaction, name: str):
 
         if interaction.user.id in {member.user_id for member in club.members}:
             return await interaction.response.send_message(
-                f"You are already in club {name}"
+                ephemeral=True,
+                content=f"You are already in club {name}",
             )
 
         club.members.append(ClubMember(user_id=interaction.user.id))
 
-    await interaction.response.send_message(f"Joined club {name}")
-
+    await interaction.response.send_message(
+        ephemeral=True, 
+        content=f"Joined club {name}",
+    )
 
 @client.slash_command(description="Leave a club")
 async def leave_club(interaction: Interaction, name: str):
@@ -770,7 +785,8 @@ async def leave_club(interaction: Interaction, name: str):
 
     if interaction.guild is None or interaction.channel is None:
         await interaction.response.send_message(
-            "This command must be used in a server."
+            ephemeral=True,
+            content="This command must be used in a server.",
         )
         return
 
@@ -782,11 +798,17 @@ async def leave_club(interaction: Interaction, name: str):
         ).scalar_one_or_none()
 
         if not club:
-            await interaction.response.send_message(f"Club {name} does not exist")
+            await interaction.response.send_message(
+                ephemeral=True, 
+                content=f"Club {name} does not exist",
+            )
             return
 
         if interaction.user.id not in [member.user_id for member in club.members]:
-            await interaction.response.send_message(f"You are not in club {name}")
+            await interaction.response.send_message(
+                ephemeral=True,
+                content=f"You are not in club {name}",
+            )
             return
 
         session.execute(
@@ -795,15 +817,18 @@ async def leave_club(interaction: Interaction, name: str):
             )
         )
 
-    await interaction.response.send_message(f"Left club {name}")
-
+    await interaction.response.send_message(
+        ephemeral=True, 
+        content=f"Left club {name}",
+    )
 
 @client.slash_command(description="List all clubs in a server")
 async def list_clubs(interaction: Interaction):
     """List all clubs in the server."""
     if interaction.guild is None or interaction.channel is None:
         return await interaction.response.send_message(
-            "This command must be used in a server."
+            ephemeral=True,
+            content="This command must be used in a server.",
         )
 
     with Session.begin() as session:
@@ -846,7 +871,8 @@ async def publish_to_club(interaction: Interaction, name: str):
         or not isinstance(interaction.user, Member)
     ):
         return await interaction.response.send_message(
-            "This command must be used in a thread in a server."
+            ephemeral=True,
+            content="This command must be used in a thread in a server.",
         )
 
     with Session.begin() as session:
@@ -858,7 +884,8 @@ async def publish_to_club(interaction: Interaction, name: str):
 
         if not club:
             return await interaction.response.send_message(
-                f"Club {name} does not exist"
+                ephemeral=True,
+                content=f"Club {name} does not exist",
             )
 
         if (
@@ -866,7 +893,8 @@ async def publish_to_club(interaction: Interaction, name: str):
             and not interaction.user.guild_permissions.manage_guild
         ):
             return await interaction.response.send_message(
-                f"You are not the creator of club {name}"
+                ephemeral=True,
+                content=f"You are not the creator of club {name}",
             )
 
         # First make sure the user isn't in there already
