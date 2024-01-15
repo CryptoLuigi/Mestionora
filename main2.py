@@ -827,7 +827,6 @@ async def leave_club(interaction: Interaction, name: str):
 async def list_clubs(interaction: Interaction):
     current_channel = f"{interaction.channel}"
     if current_channel == f"bots" or current_channel == f"🐍-bots":
-    """List all clubs in the server."""
         if interaction.guild is None or interaction.channel is None:
             return await interaction.response.send_message(
                 ephemeral=True,
