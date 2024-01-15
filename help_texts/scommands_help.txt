@@ -1,0 +1,24 @@
+</bless:0> - Receive a divine blessing and a *quote*. Optional: `id_num` - Pulls out a *quote*.
+`id_num` = The quote's identification number.
+
+</edit:0> `name` `text` - Allows edition an existing tag (as long as the tag has been created by you).
+`name` = The name of the tag you want to edit.
+`text` = Content you want to store in the tag.
+
+</hello:0> - Say hello to Mestionora :slight_smile:.
+
+</praise:0> - Praise be to the gods!
+
+</rm:0> `name` - Allows removal an existing tag (as long as the tag has been created by you).
+`name` = The name of the tag you want to remove.
+
+</show:0> `name` - Allows to display an existing tag.
+`name` = The name of the tag you want to display.
+
+</tag:0> `name` `text` - Allows creation of a new tag.
+`name` = The name of the tag you want to create.
+`text` = Content you want to store in the tag.
+
+</give:0> `name` `member` - Allows to change the owner of once of your tags.
+`name` = The name of the tag you want to give.
+`member` = The user you want to set as the owner.
