@@ -1,12 +1,12 @@
-import cooldowns, random , nextcord, sqlite3, calendar, os
+import cooldowns, random, nextcord, sqlite3, calendar, os, datetime, pytz
 from enum import Enum
 from nextcord import Intents, Interaction, Member, Embed, Message, ButtonStyle
 from nextcord.ext import application_checks, commands
 from cooldowns import CallableOnCooldown, Cooldown, SlashBucket
-from datetime import datetime
 from typing import Optional
 from dotenv import load_dotenv
 from utils import TagModal, get_page_giflist, get_page_taglist
+from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -27,14 +27,14 @@ introchannel  = f'<#721199596084396063>'
 botchannel = f'<#638020706935767100>'
 rolechannel = f'<#637097683030638624>'
 
-@client.message_command(name="Convert to fxtwitter")
-async def conv_fxtwitter(interaction: Interaction, message: Message):
+@client.message_command(name="Convert to vxtwitter")
+async def conv_vxtwitter(interaction: Interaction, message: Message):
     msg = message.content
     x = msg.find("https://twitter.com/")
     if x == -1:
         await interaction.response.send_message("Nothing to convert", ephemeral=True)
     else:
-        msg = msg.replace("https://twitter.com/","https://fxtwitter.com/")
+        msg = msg.replace("https://twitter.com/","https://vxtwitter.com/")
         await interaction.response.send_message(f"{msg}", ephemeral=True)
 
 @client.slash_command(description="Fetch the list of bots on the server.")
@@ -45,7 +45,7 @@ async def list_bots(interaction):
         guild = nextcord.utils.find(lambda g: g.id == interaction.guild.id, client.guilds)
         contentmsg = "This is the list of bots in the *Ascendance of a Bookworm* discord server:\n\n"
         for member in guild.members:
-            if member.bot
+            if member.bot:
                 contentmsg += f"• {member.mention}\n"
         await interaction.response.send_message(contentmsg)
         print(f"{interaction.user} requested the bot list")
@@ -73,9 +73,6 @@ async def on_member_join(member):
     channel = client.get_channel(ChannelID)
     allowedserver = client.get_guild(ServerID)
     if f'{servercheck}' == f'{allowedserver}':
-        embed=Embed(title=f"Welcome!", description=f"{member.mention}, welcome to Chibi's Library 📚.\nCheck out <#1029192039293792377> to get roles.", type="image",color=0xf1c40f)
-        embed.set_image("https://cdn.discordapp.com/attachments/946041447348596747/1029832048522821723/image.png?size=4096")
-        await channel.send(embed=embed)
         bookwormrole = nextcord.utils.get(servercheck.roles, name="Bookworms 📚")
         botsrole = nextcord.utils.get(servercheck.roles, name="Bots")
         if member.bot:
@@ -86,15 +83,14 @@ async def on_member_join(member):
     channel = client.get_channel(ChannelID2)
     allowedserver = client.get_guild(ServerID2)
     if f'{servercheck}' == f'{allowedserver}':
-        embed=nextcord.Embed(title="Welcome!",description=f"{member.mention} welcome to **Ascendance of a Bookworm!** Be sure to check our {welcomechannel}! Feel free to introduce yourself in {introchannel} and get a role in {rolechannel} <:MyneSparkle:1018941182430154902>",color=0xf1c40f)
-        await channel.send(embed=embed)
+        await channel.send(f"Welcome! {member.mention} welcome to **Ascendance of a Bookworm!** Be sure to check our {welcomechannel}! Feel free to introduce yourself in {introchannel} and get a role in {rolechannel} <:MyneSparkle:1018941182430154902>")
 
 
 # Start up message
 @client.event
 async def on_ready():
     print('Mestionora lives'.format(client))
-    d = datetime.today()
+    d = datetime.datetime.today()
     w = calendar.day_name[d.weekday()]
     print('Mestionora wishes you a happy', w)
 
@@ -405,6 +401,77 @@ async def taglist(interaction:Interaction, page:Optional[int], set_member:Option
     print(f"{interaction.user.name} requested the taglist")
     await get_page_taglist(client,interaction,page,set_member)
 
+def is_dst(currenttime):
+    if currenttime > datetime.datetime(currenttime.year, 11, 5, 2, tzinfo=currenttime.tzinfo) or currenttime < datetime.datetime(currenttime.year, 3, 12, 2, tzinfo=currenttime.tzinfo):
+        return True
+    else:
+        return False
+
+#myneday command
+@client.slash_command(description="Print time left for prepub")
+async def mynetime(interaction : Interaction):
+    tz_locale = pytz.timezone("America/Toronto")
+    dst = currenttime = datetime.datetime.now(tz_locale)
+    weekday = currenttime.weekday()
+    addedtime = currenttime + datetime.timedelta(days=7-weekday)
+    if dst:
+        if currenttime.hour <= 17 and weekday == 0:
+            addedtime = currenttime
+    else:
+        if currenttime.hour <= 17 and weekday == 0:
+            addedtime = currenttime
+    fixedtime = datetime.datetime(addedtime.year, addedtime.month, addedtime.day, hour=17, tzinfo=addedtime.tzinfo)
+    if dst:
+        fixedtime = datetime.datetime(addedtime.year, addedtime.month, addedtime.day, hour=17, tzinfo=addedtime.tzinfo)
+    timestamp = f"<t:{int(fixedtime.timestamp())}:R>"
+    embed = nextcord.Embed(title="Myneday", description=f"Next prepub {timestamp} on {timestamp.replace(':R','')}.", color=random.randint(0x0, 0xffffff))
+
+    myneday_gifs = (
+        'https://cdn.discordapp.com/attachments/1051224405688197130/1107797923753902150/ascendence-of-a-bookworm-bookworm-monday.gif',
+        'https://cdn.discordapp.com/attachments/1003970211692695642/1110114383708823572/Its_myneday.gif',
+        'https://cdn.discordapp.com/attachments/630607287660314634/1168523436331638784/giphy1.gif?ex=65521341&is=653f9e41&hm=93aad3ae52d7cab17d19dbb1e233028de553066039706aa8323a3641c38b02c0&',
+        'https://cdn.discordapp.com/attachments/1003970211692695642/1097360326317592667/giphy-1.gif'
+        )
+    if weekday == 0:
+        embed.set_image(random.choice(myneday_gifs))
+    else:
+        embed.set_image('https://cdn.discordapp.com/attachments/1051224405688197130/1107797980179857499/ascendence-of-a-bookworm-bookworm-anime.gif')
+    await interaction.response.send_message(embed=embed)
+
+@client.slash_command(description="Print time left for prepub")
+@cooldowns.cooldown(1, 30, bucket=SlashBucket.author)
+async def dietlindetime(interaction : Interaction):
+    current_channel = f"{interaction.channel}"
+    if current_channel == f'pre-pub' or current_channel == f'Church Of Dietlinde':
+        print(f"{interaction.user.id}")
+        if interaction.user.id == int(519916455857487872):
+            tz_locale = pytz.timezone("America/Toronto")
+            currenttime = datetime.datetime.now(tz_locale)
+            dst = is_dst(currenttime)
+            weekday = currenttime.weekday()
+            addedtime = currenttime + datetime.timedelta(days=7-weekday)
+            if dst:
+                if currenttime.hour <= 16 and weekday == 0:
+                    addedtime = currenttime
+            else:
+                if currenttime.hour <= 17 and weekday == 0:
+                    addedtime = currenttime
+            fixedtime = datetime.datetime(addedtime.year, addedtime.month, addedtime.day, hour=17, tzinfo=addedtime.tzinfo)
+            if dst:
+                fixedtime = datetime.datetime(addedtime.year, addedtime.month, addedtime.day, hour=16, tzinfo=addedtime.tzinfo)
+            timestamp = f"<t:{int(fixedtime.timestamp())}:R>"
+            embed = nextcord.Embed(title="Detlinde Day", description=f"Next prepub {timestamp} on {timestamp.replace(':R','')}.", color=random.randint(0x0, 0xffffff))
+            if weekday == 0:
+                embed.set_image('https://cdn.discordapp.com/attachments/1029754680584192132/1159320943341097030/eeeeee1.png')
+            else:
+                embed.set_image('https://cdn.discordapp.com/attachments/1029754680584192132/1159320943341097030/eeeeee1.png')
+            await interaction.response.send_message(embed=embed)
+        else:    
+            await interaction.response.send_message(ephemeral=True, content=f"{interaction.user.mention} Only real Doge can use this!")
+
+    else:
+        await interaction.response.send_message(ephemeral=True, content=f"{interaction.user.mention} This can only be used in prepub!")
+
 # Help command
 @client.slash_command(description="Get help from Mestionora")
 async def help_mestionora(interaction):
@@ -423,7 +490,8 @@ async def help_mestionora(interaction):
         </praise:0> - Praise be to the gods!
 
         </rm:0> `name` - Allows removal an existing tag (as long as the tag has been created by you).
-        `name` = The name of the tag you want to remove.
+        `name` = The name of the tag you want to remove.\
+        
 
         </show:0> `name` - Allows to display an existing tag.
         `name` = The name of the tag you want to display.
