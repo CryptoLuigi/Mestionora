@@ -657,8 +657,11 @@ import sqlalchemy as sa
 from src.clubs.models import Club, ClubMember
 from src import Session
 
+@client.slash_command()
+async def club(interaction: Interaction):
+    pass
 
-@client.slash_command(description="Create a club")
+@club.subcommand(description="Create a club", name="create")
 async def create_club(interaction: Interaction, name: str):
     """Create a club. Clubs are used to get mentions when threads related to the club are created."""
     name = name.lower()
@@ -694,7 +697,7 @@ async def create_club(interaction: Interaction, name: str):
     )
 
 
-@client.slash_command(description="Delete a club")
+@club.subcommand(description="Delete a club", name="delete")
 async def delete_club(interaction: Interaction, name: str):
     """Delete a club. This will remove all members from the club."""
     name = name.lower()
@@ -742,7 +745,7 @@ async def delete_club(interaction: Interaction, name: str):
     )
 
 
-@client.slash_command(description="Join a club")
+@club.subcommand(description="Join a club", name="join")
 async def join_club(interaction: Interaction, name: str):
     """Join a club. You will get mentions when threads related to the club are created."""
     name = name.lower()
@@ -779,7 +782,7 @@ async def join_club(interaction: Interaction, name: str):
         content=f"Joined club {name}",
     )
 
-@client.slash_command(description="Leave a club")
+@club.subcommand(description="Leave a club", name="leave")
 async def leave_club(interaction: Interaction, name: str):
     """Leave a club. You will no longer get mentions when threads related to the club are created."""
     name = name.lower()
@@ -823,7 +826,7 @@ async def leave_club(interaction: Interaction, name: str):
         content=f"Left club {name}",
     )
 
-@client.slash_command(description="List all clubs in a server")
+@club.subcommand(description="List all clubs in a server", name="list")
 async def list_clubs(interaction: Interaction):
     current_channel = f"{interaction.channel}"
     if current_channel == f"bots" or current_channel == f"🐍-bots":
@@ -893,7 +896,7 @@ async def list_clubs(interaction: Interaction):
             )
 
 
-@client.slash_command(description="Publish to a club")
+@club.subcommand(description="Publish to a club", name="publish")
 async def publish_to_club(interaction: Interaction, name: str):
     """Publish a thread to a club.
     This will add all the members of this club to this thread, which gives them a notification.
@@ -926,12 +929,16 @@ async def publish_to_club(interaction: Interaction, name: str):
 
         if (
             club.creator_id != interaction.user.id
-            and not interaction.user.guild_permissions.manage_guild
+            and not interaction.user.guild_permissions.manage_threads
         ):
             return await interaction.response.send_message(
                 ephemeral=True,
                 content=f"You are not the creator of club {name}",
             )
+
+        # Pin the first message
+        first_message = await interaction.channel.history(limit=1, oldest_first=True).get()
+        await first_message.pin()
 
         # First make sure the user isn't in there already
         members_in_channel = {member.id for member in interaction.channel.members}
