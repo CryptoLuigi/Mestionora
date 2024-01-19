@@ -141,11 +141,7 @@ async def on_application_command_error(inter: Interaction, error):
 async def mynetime(interaction : Interaction):
     myne_hour = 16
     jnovel_tz = pytz.timezone("America/Chicago")
-    jnovel_time = jnovel_tz.localize(
-        datetime.datetime.utcnow().replace(
-            hour=myne_hour, minute=0, second=0, microsecond=0
-        )
-    )
+    jnovel_time = datetime.datetime.now(tz=jnovel_tz).replace(hour=myne_hour, minute=0, second=0, microsecond=0)
 
     if jnovel_time.weekday() != 0 or jnovel_time.hour > myne_hour:
         myne_time = jnovel_time + datetime.timedelta(days=7 - jnovel_time.weekday())
@@ -561,35 +557,35 @@ def is_dst(currenttime):
         return False
 
 #myneday command
-@client.slash_command(description="Print time left for prepub")
-async def mynetime(interaction : Interaction):
-    tz_locale = pytz.timezone("America/Toronto")
-    dst = currenttime = datetime.datetime.now(tz_locale)
-    weekday = currenttime.weekday()
-    addedtime = currenttime + datetime.timedelta(days=7-weekday)
-    if dst:
-        if currenttime.hour <= 17 and weekday == 0:
-            addedtime = currenttime
-    else:
-        if currenttime.hour <= 17 and weekday == 0:
-            addedtime = currenttime
-    fixedtime = datetime.datetime(addedtime.year, addedtime.month, addedtime.day, hour=17, tzinfo=addedtime.tzinfo)
-    if dst:
-        fixedtime = datetime.datetime(addedtime.year, addedtime.month, addedtime.day, hour=17, tzinfo=addedtime.tzinfo)
-    timestamp = f"<t:{int(fixedtime.timestamp())}:R>"
-    embed = nextcord.Embed(title="Myneday", description=f"Next prepub {timestamp} on {timestamp.replace(':R','')}.", color=random.randint(0x0, 0xffffff))
-
-    myneday_gifs = (
-        'https://cdn.discordapp.com/attachments/1051224405688197130/1107797923753902150/ascendence-of-a-bookworm-bookworm-monday.gif',
-        'https://cdn.discordapp.com/attachments/1003970211692695642/1110114383708823572/Its_myneday.gif',
-        'https://cdn.discordapp.com/attachments/630607287660314634/1168523436331638784/giphy1.gif?ex=65521341&is=653f9e41&hm=93aad3ae52d7cab17d19dbb1e233028de553066039706aa8323a3641c38b02c0&',
-        'https://cdn.discordapp.com/attachments/1003970211692695642/1097360326317592667/giphy-1.gif'
-        )
-    if weekday == 0:
-        embed.set_image(random.choice(myneday_gifs))
-    else:
-        embed.set_image('https://cdn.discordapp.com/attachments/1051224405688197130/1107797980179857499/ascendence-of-a-bookworm-bookworm-anime.gif')
-    await interaction.response.send_message(embed=embed)
+#@client.slash_command(description="Print time left for prepub")
+#async def mynetime(interaction : Interaction):
+#    tz_locale = pytz.timezone("America/Toronto")
+#    dst = currenttime = datetime.datetime.now(tz_locale)
+#    weekday = currenttime.weekday()
+#    addedtime = currenttime + datetime.timedelta(days=7-weekday)
+#    if dst:
+#        if currenttime.hour <= 17 and weekday == 0:
+#            addedtime = currenttime
+#    else:
+#        if currenttime.hour <= 17 and weekday == 0:
+#            addedtime = currenttime
+#    fixedtime = datetime.datetime(addedtime.year, addedtime.month, addedtime.day, hour=17, tzinfo=addedtime.tzinfo)
+#    if dst:
+#        fixedtime = datetime.datetime(addedtime.year, addedtime.month, addedtime.day, hour=17, tzinfo=addedtime.tzinfo)
+#    timestamp = f"<t:{int(fixedtime.timestamp())}:R>"
+#    embed = nextcord.Embed(title="Myneday", description=f"Next prepub {timestamp} on {timestamp.replace(':R','')}.", color=random.randint(0x0, 0xffffff))#
+#
+#    myneday_gifs = (
+#        'https://cdn.discordapp.com/attachments/1051224405688197130/1107797923753902150/ascendence-of-a-bookworm-bookworm-monday.gif',
+#        'https://cdn.discordapp.com/attachments/1003970211692695642/1110114383708823572/Its_myneday.gif',
+#        'https://cdn.discordapp.com/attachments/630607287660314634/1168523436331638784/giphy1.gif?ex=65521341&is=653f9e41&hm=93aad3ae52d7cab17d19dbb1e233028de553066039706aa8323a3641c38b02c0&',
+#        'https://cdn.discordapp.com/attachments/1003970211692695642/1097360326317592667/giphy-1.gif'
+#        )
+#    if weekday == 0:
+#        embed.set_image(random.choice(myneday_gifs))
+#    else:
+#        embed.set_image('https://cdn.discordapp.com/attachments/1051224405688197130/1107797980179857499/ascendence-of-a-bookworm-bookworm-anime.gif')
+#    await interaction.response.send_message(embed=embed)
 
 @client.slash_command(description="Print time left for prepub")
 @cooldowns.cooldown(1, 30, bucket=SlashBucket.author)
@@ -669,7 +665,8 @@ async def create_club(interaction: Interaction, name: str):
 
     if interaction.guild is None or interaction.channel is None:
         return await interaction.response.send_message(
-            "This command must be used in a server."
+            ephemeral=True,
+            content="This command must be used in a server.",
         )
 
     with Session.begin() as session:
@@ -681,7 +678,8 @@ async def create_club(interaction: Interaction, name: str):
 
         if club:
             return await interaction.response.send_message(
-                f"Club {name} already exists"
+                ephemeral=True,
+                content=f"Club {name} already exists",
             )
 
         club = Club(
@@ -690,7 +688,10 @@ async def create_club(interaction: Interaction, name: str):
         club.members.append(ClubMember(user_id=interaction.user.id))
         session.add(club)
 
-    await interaction.response.send_message(f"Created club `{name}`")
+    await interaction.response.send_message(
+        ephemeral=True,
+        content=f"Created club `{name}`",
+    )
 
 
 @client.slash_command(description="Delete a club")
@@ -704,7 +705,8 @@ async def delete_club(interaction: Interaction, name: str):
         or not isinstance(interaction.user, Member)
     ):
         return await interaction.response.send_message(
-            "This command must be used in a server."
+            ephemeral=True,
+            content="This command must be used in a server.",
         )
 
     with Session.begin() as session:
@@ -716,7 +718,8 @@ async def delete_club(interaction: Interaction, name: str):
 
         if not club:
             return await interaction.response.send_message(
-                f"Club {name} does not exist"
+                ephemeral=True, 
+                content=f"Club {name} does not exist",
             )
 
         if (
@@ -724,7 +727,8 @@ async def delete_club(interaction: Interaction, name: str):
             and not interaction.user.guild_permissions.manage_guild
         ):
             return await interaction.response.send_message(
-                f"You are not the creator of the club {name}"
+                ephemeral=True, 
+                content=f"You are not the creator of the club {name}",
             )
 
         for member in club.members:
@@ -732,7 +736,10 @@ async def delete_club(interaction: Interaction, name: str):
 
         session.delete(club)
 
-    await interaction.response.send_message(f"Deleted club {name}")
+    await interaction.response.send_message(
+        ephemeral=True, 
+        content=f"Deleted club {name}",
+    )
 
 
 @client.slash_command(description="Join a club")
@@ -742,7 +749,8 @@ async def join_club(interaction: Interaction, name: str):
 
     if interaction.guild is None or interaction.channel is None:
         return await interaction.response.send_message(
-            "This command must be used in a server."
+            ephemeral=True, 
+            content="This command must be used in a server.",
         )
 
     with Session.begin() as session:
@@ -754,18 +762,22 @@ async def join_club(interaction: Interaction, name: str):
 
         if not club:
             return await interaction.response.send_message(
-                f"Club {name} does not exist"
+                ephemeral=True, 
+                content=f"Club {name} does not exist",
             )
 
         if interaction.user.id in {member.user_id for member in club.members}:
             return await interaction.response.send_message(
-                f"You are already in club {name}"
+                ephemeral=True,
+                content=f"You are already in club {name}",
             )
 
         club.members.append(ClubMember(user_id=interaction.user.id))
 
-    await interaction.response.send_message(f"Joined club {name}")
-
+    await interaction.response.send_message(
+        ephemeral=True, 
+        content=f"Joined club {name}",
+    )
 
 @client.slash_command(description="Leave a club")
 async def leave_club(interaction: Interaction, name: str):
@@ -774,7 +786,8 @@ async def leave_club(interaction: Interaction, name: str):
 
     if interaction.guild is None or interaction.channel is None:
         await interaction.response.send_message(
-            "This command must be used in a server."
+            ephemeral=True,
+            content="This command must be used in a server.",
         )
         return
 
@@ -786,11 +799,17 @@ async def leave_club(interaction: Interaction, name: str):
         ).scalar_one_or_none()
 
         if not club:
-            await interaction.response.send_message(f"Club {name} does not exist")
+            await interaction.response.send_message(
+                ephemeral=True, 
+                content=f"Club {name} does not exist",
+            )
             return
 
         if interaction.user.id not in [member.user_id for member in club.members]:
-            await interaction.response.send_message(f"You are not in club {name}")
+            await interaction.response.send_message(
+                ephemeral=True,
+                content=f"You are not in club {name}",
+            )
             return
 
         session.execute(
@@ -799,41 +818,79 @@ async def leave_club(interaction: Interaction, name: str):
             )
         )
 
-    await interaction.response.send_message(f"Left club {name}")
-
+    await interaction.response.send_message(
+        ephemeral=True, 
+        content=f"Left club {name}",
+    )
 
 @client.slash_command(description="List all clubs in a server")
 async def list_clubs(interaction: Interaction):
-    """List all clubs in the server."""
-    if interaction.guild is None or interaction.channel is None:
-        return await interaction.response.send_message(
-            "This command must be used in a server."
-        )
-
-    with Session.begin() as session:
-        clubs = (
-            session.execute(
-                sa.select(Club).filter(Club.guild_id == interaction.guild.id)
-            )
-            .scalars()
-            .all()
-        )
-
-        if not clubs:
-            description = f"There are no clubs in {interaction.guild.name}."
-        else:
-            description = f"List of the clubs in {interaction.guild.name}:\n"
-            description += "\n".join(
-                f"{i+1}. `{club.name}` ({len(club.members)} members)"
-                for i, club in enumerate(clubs)
+    current_channel = f"{interaction.channel}"
+    if current_channel == f"bots" or current_channel == f"🐍-bots":
+        if interaction.guild is None or interaction.channel is None:
+            return await interaction.response.send_message(
+                ephemeral=True,
+                content="This command must be used in a server.",
             )
 
-        embed = Embed(
-            title="Clubs",
-            description=description,
-            color=0xF1C40F,
-        )
-        await interaction.response.send_message(embed=embed)
+        with Session.begin() as session:
+            clubs = (
+                session.execute(
+                    sa.select(Club).filter(Club.guild_id == interaction.guild.id)
+                )
+                .scalars()
+                .all()
+            )
+
+            if not clubs:
+                description = f"There are no clubs in {interaction.guild.name}."
+            else:
+                description = f"List of the clubs in {interaction.guild.name}:\n"
+                description += "\n".join(
+                    f"{i+1}. `{club.name}` ({len(club.members)} members)"
+                    for i, club in enumerate(clubs)
+                )
+
+            embed = Embed(
+                title="Clubs",
+                description=description,
+                color=0xF1C40F,
+            )
+            await interaction.response.send_message(embed=embed)
+    else:
+        if interaction.guild is None or interaction.channel is None:
+            return await interaction.response.send_message(
+                ephemeral=True,
+                content="This command must be used in a server.",
+            )
+
+        with Session.begin() as session:
+            clubs = (
+                session.execute(
+                    sa.select(Club).filter(Club.guild_id == interaction.guild.id)
+                )
+                .scalars()
+                .all()
+            )
+
+            if not clubs:
+                description = f"There are no clubs in {interaction.guild.name}."
+            else:
+                description = f"List of the clubs in {interaction.guild.name}:\n"
+                description += "\n".join(
+                    f"{i+1}. `{club.name}` ({len(club.members)} members)"
+                    for i, club in enumerate(clubs)
+                )
+
+            embed = Embed(
+                title="Clubs",
+                description=description,
+                color=0xF1C40F,
+            )
+            await interaction.response.send_message(
+                ephemeral=True, 
+                embed=embed,
+            )
 
 
 @client.slash_command(description="Publish to a club")
@@ -850,7 +907,8 @@ async def publish_to_club(interaction: Interaction, name: str):
         or not isinstance(interaction.user, Member)
     ):
         return await interaction.response.send_message(
-            "This command must be used in a thread in a server."
+            ephemeral=True,
+            content="This command must be used in a thread in a server.",
         )
 
     with Session.begin() as session:
@@ -862,7 +920,8 @@ async def publish_to_club(interaction: Interaction, name: str):
 
         if not club:
             return await interaction.response.send_message(
-                f"Club {name} does not exist"
+                ephemeral=True,
+                content=f"Club {name} does not exist",
             )
 
         if (
@@ -870,7 +929,8 @@ async def publish_to_club(interaction: Interaction, name: str):
             and not interaction.user.guild_permissions.manage_guild
         ):
             return await interaction.response.send_message(
-                f"You are not the creator of club {name}"
+                ephemeral=True,
+                content=f"You are not the creator of club {name}",
             )
 
         # First make sure the user isn't in there already
