@@ -936,16 +936,28 @@ async def publish_to_club(interaction: Interaction, name: str):
                 content=f"You are not the creator of club {name}",
             )
 
-        # Pin the first message
-        first_message = await interaction.channel.history(limit=1, oldest_first=True).get()
-        await first_message.pin()
+        # Pin the first message if it exists, and we have permission to do so
+        if (
+            interaction.channel.starter_message
+            and interaction.channel.permissions_for(
+                interaction.guild.me
+            ).manage_messages
+        ):
+            await interaction.channel.starter_message.pin()
 
-        # First make sure the user isn't in there already
-        members_in_channel = {member.id for member in interaction.channel.members}
-        club_members = {member.user_id for member in club.members}
+        async def consolidate_members():
+            # Find all the members that aren't in the thread, and add them
+            members = await interaction.channel.fetch_members()
+            members_in_channel = {member.id for member in members}
+            club_members = {member.user_id for member in club.members}
 
-        for member_id in club_members.difference(members_in_channel):
-            await interaction.channel.add_user(nextcord.Object(id=member_id))
+            for member_id in club_members.difference(members_in_channel):
+                await interaction.channel.add_user(nextcord.Object(id=member_id))
+
+        # For some reason discord seems to be dropping some of the people we add to the thread
+        #  so perform this action twice to ensure everyone is added
+        await consolidate_members()
+        await consolidate_members()
 
         await interaction.response.send_message(f"Added everyone from club {name}")
 
