@@ -1,6 +1,5 @@
-import datetime
+from datetime import datetime, time, timedelta, timezone
 
-from datetime import *
 
 def get_aoab_next_prepub_timestamp():
     now = datetime.now(tz=timezone.utc)
@@ -10,6 +9,6 @@ def get_aoab_next_prepub_timestamp():
     delta = release_time - now
     days = delta.days
     h = delta.seconds // 3600
-    m = (delta.seconds % 3600)//60
+    m = (delta.seconds % 3600) // 60
     s = delta.seconds % 60
-    return days,h,m,s
+    return days, h, m, s

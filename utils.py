@@ -1,23 +1,22 @@
-import nextcord, sqlite3
-from nextcord import Interaction, Embed, ButtonStyle, TextInputStyle
-from nextcord.ui import View, Button, TextInput, Modal
+import discord, sqlite3
+from discord import Interaction, Embed, ButtonStyle, TextStyle
+from discord.ui import View, Button, TextInput, Modal
 from math import ceil
 
 conn = sqlite3.connect("db_tags.db")
 c = conn.cursor()
 
+
 class TagModal(Modal):
     def __init__(self, usemode, msg, tagn):
-        ModalTitle = ""
         if usemode == "create":
             ModalTitle = "Create a Tag"
         elif usemode == "edit":
             ModalTitle = "Edit a Tag"
         else:
             ModalTitle = "Error: Unknown usemode"
-        super().__init__(
-            ModalTitle,
-        )
+
+        super().__init__(title=ModalTitle)
 
         self.usemode = usemode
         self.msg = msg
@@ -28,9 +27,9 @@ class TagModal(Modal):
             min_length=1,
             max_length=50,
             required=True,
-            default_value=f"{tagn}",
+            default=f"{tagn}",
             placeholder="Tag Name",
-            style=nextcord.TextInputStyle.short,
+            style=discord.TextStyle.short,
         )
         self.add_item(self.tagname)
         self.tagcontent = TextInput(
@@ -38,9 +37,9 @@ class TagModal(Modal):
             min_length=1,
             max_length=4000,
             required=True,
-            default_value=f"{msg}",
+            default=f"{msg}",
             placeholder="Enter wisdom here",
-            style=nextcord.TextInputStyle.paragraph,
+            style=discord.TextStyle.paragraph,
         )
         self.add_item(self.tagcontent)
 
@@ -107,16 +106,14 @@ class TagModal(Modal):
 
 class SetPage(Modal):
     def __init__(self):
-        super().__init__(
-            "Set Page",
-        )
+        super().__init__(title="Set Page")
 
         self.setpagenb = TextInput(
             label="Page number:",
             min_length=1,
             max_length=50,
             required=True,
-            style=TextInputStyle.short,
+            style=TextStyle.short,
         )
         self.add_item(self.setpagenb)
 
@@ -266,7 +263,7 @@ async def get_page_taglist(
         else:
             current_id = int(tag_id[0])
 
-        guild = client.get_guild(interaction.guild.id)
+        guild = interaction.guild
 
         member = None
         if current_id != None:
