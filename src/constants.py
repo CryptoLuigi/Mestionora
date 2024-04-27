@@ -1,0 +1,7 @@
+chibi_server_id = 883777134282293258
+bookworm_server_id = 630606651992309760
+# chibi_welcome_channel_id = 1028869157841797180
+welcome_channel_id = 630606651992309763
+intro_channel_id = 721199596084396063
+role_channel_id = 637097683030638624
+bot_channel_id = 638020706935767100
