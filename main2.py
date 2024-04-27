@@ -920,7 +920,6 @@ async def publish_to_club(interaction: Interaction, name: str):
             content="This command must be used in a thread in a server.",
         )
 
-    await interaction.response.send_message("Adding users to the thread...")
     with Session.begin() as session:
         club = session.execute(
             sa.select(Club).filter(
@@ -929,7 +928,7 @@ async def publish_to_club(interaction: Interaction, name: str):
         ).scalar_one_or_none()
 
         if not club:
-            return await interaction.response.edit_message(
+            return await interaction.response.send_message(
                 ephemeral=True,
                 content=f"Club {name} does not exist",
             )
@@ -938,22 +937,24 @@ async def publish_to_club(interaction: Interaction, name: str):
             club.creator_id != interaction.user.id
             and not interaction.user.guild_permissions.manage_threads
         ):
-            return await interaction.response.edit_message(
+            return await interaction.response.send_message(
                 ephemeral=True,
                 content=f"You are not the creator of club {name}",
             )
 
+        await interaction.response.defer(with_message=True)
+
         # Pin the first message if it exists, and we have permission to do so
-        if (
-            interaction.channel.starter_message
-            and interaction.channel.permissions_for(
-                interaction.guild.me
-            ).manage_messages
-        ):
-            try:
+        try:
+            if (
+                interaction.channel.starter_message
+                and interaction.channel.permissions_for(
+                    interaction.guild.me
+                ).manage_messages
+            ):
                 await interaction.channel.starter_message.pin()
-            except Exception:
-                print("Error pinning the first message")
+        except Exception:
+            print("Error pinning the first message")
 
         async def consolidate_members():
             # Find all the members that aren't in the thread, and add them
@@ -972,7 +973,7 @@ async def publish_to_club(interaction: Interaction, name: str):
         await consolidate_members()
         await consolidate_members()
 
-        await interaction.response.edit_message(f"Added everyone from club {name}")
+        await interaction.edit_original_message(content=f"Added everyone from club {name}")
 
 
 client.run(os.getenv("TOKEN"))
