@@ -1,4 +1,11 @@
-import cooldowns, random, nextcord, sqlite3, calendar, os, datetime, pytz
+import cooldowns
+import random
+import nextcord
+import sqlite3
+import calendar
+import os
+import datetime
+import pytz
 from enum import Enum
 from nextcord import Intents, Interaction, Member, Embed, Message, ButtonStyle, Thread
 from nextcord.ext import application_checks, commands
@@ -6,7 +13,6 @@ from cooldowns import CallableOnCooldown, Cooldown, SlashBucket
 from typing import Optional
 from dotenv import load_dotenv
 from utils import TagModal, get_page_giflist, get_page_taglist
-from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -119,7 +125,7 @@ async def on_application_command_error(inter: Interaction, error):
         )
     elif isinstance(error, application_checks.ApplicationMissingAnyRole):
         await inter.send(
-            ephemeral=True, content=f"You don't have permission to do that."
+            ephemeral=True, content="You don't have permission to do that."
         )
     elif isinstance(error, sqlite3.OperationalError):
         await inter.send(
@@ -829,7 +835,7 @@ async def leave_club(interaction: Interaction, name: str):
 @club.subcommand(description="List all clubs in a server", name="list")
 async def list_clubs(interaction: Interaction):
     current_channel = f"{interaction.channel}"
-    if current_channel == f"bots" or current_channel == f"🐍-bots":
+    if current_channel == "bots" or current_channel == "🐍-bots":
         if interaction.guild is None or interaction.channel is None:
             return await interaction.response.send_message(
                 ephemeral=True,
@@ -914,6 +920,7 @@ async def publish_to_club(interaction: Interaction, name: str):
             content="This command must be used in a thread in a server.",
         )
 
+    await interaction.response.send_message("Adding users to the thread...")
     with Session.begin() as session:
         club = session.execute(
             sa.select(Club).filter(
@@ -922,7 +929,7 @@ async def publish_to_club(interaction: Interaction, name: str):
         ).scalar_one_or_none()
 
         if not club:
-            return await interaction.response.send_message(
+            return await interaction.response.edit_message(
                 ephemeral=True,
                 content=f"Club {name} does not exist",
             )
@@ -931,7 +938,7 @@ async def publish_to_club(interaction: Interaction, name: str):
             club.creator_id != interaction.user.id
             and not interaction.user.guild_permissions.manage_threads
         ):
-            return await interaction.response.send_message(
+            return await interaction.response.edit_message(
                 ephemeral=True,
                 content=f"You are not the creator of club {name}",
             )
@@ -943,7 +950,10 @@ async def publish_to_club(interaction: Interaction, name: str):
                 interaction.guild.me
             ).manage_messages
         ):
-            await interaction.channel.starter_message.pin()
+            try:
+                await interaction.channel.starter_message.pin()
+            except Exception:
+                print("Error pinning the first message")
 
         async def consolidate_members():
             # Find all the members that aren't in the thread, and add them
@@ -952,14 +962,17 @@ async def publish_to_club(interaction: Interaction, name: str):
             club_members = {member.user_id for member in club.members}
 
             for member_id in club_members.difference(members_in_channel):
-                await interaction.channel.add_user(nextcord.Object(id=member_id))
+                try:
+                    await interaction.channel.add_user(nextcord.Object(id=member_id))
+                except Exception:
+                    print("Error adding user:", member_id)
 
         # For some reason discord seems to be dropping some of the people we add to the thread
         #  so perform this action twice to ensure everyone is added
         await consolidate_members()
         await consolidate_members()
 
-        await interaction.response.send_message(f"Added everyone from club {name}")
+        await interaction.response.edit_message(f"Added everyone from club {name}")
 
 
 client.run(os.getenv("TOKEN"))
