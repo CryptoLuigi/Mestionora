@@ -71,29 +71,24 @@ class Events(commands.Cog, name="events"):
 
         if payload.channel_id in [intro_channel_id, welcome_channel_id]:
             await message.add_reaction(payload.emoji)
-            print("Mestionora added a reaction")
 
     # Random quote generator
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
-        banchannel = f"bots"
-        if message.author == self._bot.user:
+        if (
+            message.author == self._bot.user
+            or not isinstance(message.channel, discord.TextChannel)
+            or not message.channel.name == "bots"
+        ):
             return
 
-        print(f"{message.channel}")
-
-        if (f"{message.channel}") != banchannel:
+        if self._cooldown.update_rate_limit(message):
+            assert self._cooldown._cooldown is not None
             return
-
-        retry_after = self._cooldown.update_rate_limit(message)
 
         if "praise be to the gods" in message.content.lower():
-            if retry_after:
-                assert self._cooldown._cooldown is not None
-                print("cooldown")
-                return
-
             await message.channel.send("Blessings upon " + str(message.author.mention))
+
             links = [
                 "https://cdn.discordapp.com/attachments/1027597999091753010/1028786413455552583/unknown.png",
                 "https://cdn.discordapp.com/attachments/883777134911422466/1028791311807037510/LN_P4V3-2.jpg",
@@ -108,22 +103,11 @@ class Events(commands.Cog, name="events"):
             await message.channel.send(random.choice(links))
 
         if message.content.startswith("I hate books"):
-            if retry_after:
-                assert self._cooldown._cooldown is not None
-                print("cooldown")
-                return
-
             await message.channel.send("You are cursed for 10 generations.")
 
         if "mestionora, bless" in message.content.lower():
-            if retry_after:
-                assert self._cooldown._cooldown is not None
-                print("cooldown")
-                return
-
             value = random.randint(1, 46)
             c.execute(f"SELECT LINE from quotes where ID = '{value}'")
-            print("Mestionora fetches quote from the db")
             bless = c.fetchone()
             await message.channel.send(bless[0])
 

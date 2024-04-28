@@ -62,7 +62,6 @@ class TagModal(Modal):
                 val = (name, text, interaction.user.id)
                 c.execute(sql, val)
                 conn.commit()
-                print("Mestionora added to the db")
                 return await interaction.response.send_message(
                     ephemeral=True,
                     content=f'Tag "{name}" created.\n__**Preview:**__\n{text}',
@@ -79,7 +78,6 @@ class TagModal(Modal):
             elif tagn != name and msg == text:
                 c.execute(f"UPDATE tags SET NAME = '{name}' WHERE NAME = '{tagn}'")
                 conn.commit()
-                print("Mestionora edited the db (name)")
                 return await interaction.response.send_message(
                     ephemeral=True,
                     content=f'Tag "{tagn}" got their tag name edited.\n__**New Tag Name:**__ {name}',
@@ -87,7 +85,6 @@ class TagModal(Modal):
             elif tagn == name and msg != text:
                 c.execute(f"UPDATE tags SET LINK = '{text}' WHERE NAME = '{tagn}'")
                 conn.commit()
-                print("Mestionora edited the db (text)")
                 return await interaction.response.send_message(
                     ephemeral=True,
                     content=f'Tag "{tagn}" got their content edited.\n__**Preview:**__\n{text}',
@@ -97,7 +94,6 @@ class TagModal(Modal):
                 conn.commit()
                 c.execute(f"UPDATE tags SET NAME = '{name}' WHERE NAME = '{tagn}'")
                 conn.commit()
-                print("Mestionora edited the db (name+text)")
                 return await interaction.response.send_message(
                     ephemeral=True,
                     content=f'Tag "{tagn}" got their content and tag name edited.\n__**New Tag Name:**__ {name}\n__**Preview:**__\n{text}',

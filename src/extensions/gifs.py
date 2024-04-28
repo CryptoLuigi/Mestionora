@@ -18,7 +18,7 @@ class Gifs(commands.Cog, name="gifs", description="Gif commands"):
 
         items = [
             f"{_gif[0]} • **{_gif[1]}** • [View Gif]({_gif[2]})"
-            for _gif in c.execute(f"SELECT id, name, gif from gif_table").fetchall()
+            for _gif in c.execute(f"SELECT id, name, gif FROM gif_table").fetchall()
         ]
 
         view = PageView(
@@ -32,7 +32,7 @@ class Gifs(commands.Cog, name="gifs", description="Gif commands"):
         await interaction.response.send_message(embed=view.embed, view=view)
 
     # gif command, shows entry from database Usage: /gif
-    @commands.cooldown(1, 30, type=commands.BucketType.member)
+    @discord.app_commands.checks.cooldown(1, 30)
     @discord.app_commands.command(description="Recieve a divine blessing")
     @discord.app_commands.describe(name="The name of the gif you want to see.")
     @discord.app_commands.describe(id_num="The id of the gif you want to see.")
@@ -44,26 +44,33 @@ class Gifs(commands.Cog, name="gifs", description="Gif commands"):
     ):
         current_channel = f"{interaction.channel}"
 
-        if current_channel == f"bots" or current_channel == f"🐍-bots":
-            if id_num == None and name == None:
-                value = random.randint(1, 76)
-                c.execute(f"SELECT gif from gif_table where id = '{value}'")
-                print("Mestionora fetches from the db".format)
-                bless = c.fetchone()
-                await interaction.response.send_message(bless[0])
-            elif id_num != None and name == None:
-                c.execute(f"SELECT gif from gif_table where id = '{id_num}'")
-                quote = c.fetchone()
-                await interaction.response.send_message(quote[0])
-            elif id_num == None and name != None:
-                c.execute(f"SELECT gif from gif_table where name = '{name}'")
-                quote = c.fetchone()
-                await interaction.response.send_message(quote[0])
-            elif id_num != None and name != None:
+        if current_channel == "bots" or current_channel == "🐍-bots":
+            if name is not None and id_num is not None:
                 await interaction.response.send_message(
                     "You cannot use the gif name and gif id simultaneously.",
                     ephemeral=True,
                 )
+                return
+            elif name is not None:
+                gif = c.execute(
+                    "SELECT gif FROM gif_table WHERE name = ?", (name,)
+                ).fetchone()
+            elif id_num is not None:
+                gif = c.execute(
+                    "SELECT gif FROM gif_table WHERE id = ?", (id_num,)
+                ).fetchone()
+            else:
+                gif = c.execute(
+                    "SELECT gif FROM gif_table ORDER BY RANDOM() LIMIT 1"
+                ).fetchone()
+
+            if gif is None:
+                await interaction.response.send_message(
+                    "No gif found with that name or id.", ephemeral=True
+                )
+                return
+
+            await interaction.response.send_message(gif[0])
         else:
             await interaction.response.send_message(
                 ephemeral=True,

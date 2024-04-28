@@ -270,8 +270,6 @@ class Clubs(commands.GroupCog, name="club", description="Commands to manage club
                 content="This command must be used in a thread in a server.",
             )
 
-        # For typing purposes, now that the above has passed, we can assert the checks
-
         with Session.begin() as session:
             club = session.execute(
                 sa.select(Club).filter(Club.name == name, Club.guild_id == guild.id)
@@ -295,11 +293,12 @@ class Clubs(commands.GroupCog, name="club", description="Commands to manage club
             await interaction.response.defer()
 
             # Pin the first message if it exists, and we have permission to do so
-            if (
-                channel.starter_message
-                and channel.permissions_for(guild.me).manage_messages
-            ):
-                await channel.starter_message.pin()
+            if channel.permissions_for(guild.me).manage_messages:
+                msgs = [
+                    msg async for msg in channel.history(limit=1, oldest_first=True)
+                ]
+                if msgs:
+                    await msgs[0].pin()
 
             async def consolidate_members():
                 # Find all the members that aren't in the thread, and add them
@@ -310,8 +309,9 @@ class Clubs(commands.GroupCog, name="club", description="Commands to manage club
                 for member_id in club_members.difference(members_in_channel):
                     try:
                         await channel.add_user(discord.Object(id=member_id))
-                    except Exception:
+                    except Exception as e:
                         print("Error adding user:", member_id)
+                        print(e)
 
             # For some reason discord seems to be dropping some of the people we add to the thread
             #  so perform this action twice to ensure everyone is added

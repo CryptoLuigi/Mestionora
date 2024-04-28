@@ -9,8 +9,7 @@ from src.utils import TagModal
 class Mestionora(commands.Bot):
 
     async def setup_hook(self) -> None:
-        pass
-        # await self.tree.sync()
+        await self.tree.sync()
 
 
 bot = commands.Bot(command_prefix="!", help_command=None, intents=Intents.all())
@@ -23,6 +22,7 @@ bot = commands.Bot(command_prefix="!", help_command=None, intents=Intents.all())
 @bot.tree.error
 async def on_error(inter: discord.Interaction, error):
     error = getattr(error, "original", error)
+    print(error, type(error))
 
     async def send(content: str, ephemeral: bool = True):
         if inter.response.is_done():
@@ -35,7 +35,9 @@ async def on_error(inter: discord.Interaction, error):
             ephemeral=True,
             content=f"You are being rate-limited! Retry in `{error.retry_after}` seconds.",
         )
-    elif isinstance(error, commands.MissingAnyRole):
+    elif isinstance(
+        error, (commands.MissingAnyRole, discord.app_commands.MissingAnyRole)
+    ):
         await send(ephemeral=True, content="You don't have permission to do that.")
     elif isinstance(error, sqlite3.OperationalError):
         await send(f"⚠There was an error with the sqlite database.⚠\n ```{error}```")
@@ -46,6 +48,14 @@ async def on_error(inter: discord.Interaction, error):
     elif isinstance(error, NameError):
         await send(f"⚠There was a name error.⚠\n ```{error}```")
         raise error
+    elif isinstance(
+        error,
+        (
+            discord.app_commands.errors.CommandOnCooldown,
+            commands.errors.CommandOnCooldown,
+        ),
+    ):
+        pass
     else:
         raise error
 

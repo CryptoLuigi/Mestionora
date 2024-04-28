@@ -25,11 +25,11 @@ class Misc(commands.Cog, name="misc", description="Miscellaneous commands"):
     pass
 
     @discord.app_commands.command(description="Print time left for prepub")
-    @commands.cooldown(1, 30, type=commands.BucketType.member)
+    @discord.app_commands.checks.cooldown(1, 30)
     async def dietlindetime(self, interaction: discord.Interaction):
         current_channel = f"{interaction.channel}"
         if current_channel == f"pre-pub" or current_channel == f"Church Of Dietlinde":
-            print(f"{interaction.user.id}")
+            print(f"{interaction.user.id} tried and failed to use /dietlindetime")
             if interaction.user.id == int(519916455857487872):
                 tz_locale = pytz.timezone("America/Toronto")
                 currenttime = datetime.datetime.now(tz_locale)
@@ -116,7 +116,7 @@ class Misc(commands.Cog, name="misc", description="Miscellaneous commands"):
             )
 
     @discord.app_commands.command(description="Fetch the list of bots on the server.")
-    @commands.cooldown(1, 30, type=commands.BucketType.member)
+    @discord.app_commands.checks.cooldown(1, 30)
     async def list_bots(self, interaction: discord.Interaction):
         current_channel = f"{interaction.channel}"
         if current_channel == "bots" or current_channel == "🐍-bot":
@@ -137,7 +137,7 @@ class Misc(commands.Cog, name="misc", description="Miscellaneous commands"):
 
     # Hello Command
     @discord.app_commands.command(description="Say hello to the Goddess")
-    @commands.cooldown(1, 30, type=commands.BucketType.member)
+    @discord.app_commands.checks.cooldown(1, 30)
     async def hello(self, interaction: discord.Interaction):
         current_channel = f"{interaction.channel}"
         if current_channel == f"bots" or current_channel == f"🐍-bot":
@@ -196,7 +196,7 @@ class Misc(commands.Cog, name="misc", description="Miscellaneous commands"):
         await interaction.response.send_message(embed=embed)
 
     # bless command, shows entry from database Usage: /bless
-    @commands.cooldown(1, 30, type=commands.BucketType.member)
+    @discord.app_commands.checks.cooldown(1, 30)
     @discord.app_commands.command(description="Recieve a divine blessing")
     @discord.app_commands.describe(id_num="The id of the quote you want to see.")
     async def bless(self, interaction: discord.Interaction, id_num: Optional[int]):
@@ -205,7 +205,6 @@ class Misc(commands.Cog, name="misc", description="Miscellaneous commands"):
             if id_num == None:
                 value = random.randint(1, 46)
                 c.execute(f"SELECT LINE from QUOTES where ID = '{value}'")
-                print("Mestionora fetches from the db".format)
                 bless = c.fetchone()
                 await interaction.response.send_message(bless[0])
             else:
@@ -220,7 +219,7 @@ class Misc(commands.Cog, name="misc", description="Miscellaneous commands"):
 
     # Praise command
     @discord.app_commands.command(description="Praise be to the Gods!")
-    @commands.cooldown(1, 30, type=commands.BucketType.member)
+    @discord.app_commands.checks.cooldown(1, 30)
     async def praise(self, interaction: discord.Interaction):
         current_channel = f"{interaction.channel}"
         if current_channel == f"bots" or current_channel == f"🐍-bots":
