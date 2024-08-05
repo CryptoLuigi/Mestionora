@@ -9,6 +9,15 @@ import pytz
 from src import c
 from src.constants import bot_channel_id
 
+myneday_gifs = (
+    "https://cdn.discordapp.com/attachments/1051224405688197130/1107797923753902150/ascendence-of-a-bookworm-bookworm-monday.gif",
+    "https://cdn.discordapp.com/attachments/1003970211692695642/1110114383708823572/Its_myneday.gif",
+    "https://cdn.discordapp.com/attachments/630607287660314634/1168523436331638784/giphy1.gif?ex=65521341&is=653f9e41&hm=93aad3ae52d7cab17d19dbb1e233028de553066039706aa8323a3641c38b02c0&",
+    "https://cdn.discordapp.com/attachments/1003970211692695642/1097360326317592667/giphy-1.gif",
+)
+not_myneday_gif = "https://cdn.discordapp.com/attachments/1051224405688197130/1107797980179857499/ascendence-of-a-bookworm-bookworm-anime.gif"
+prepub_ended_img = "https://cdn.discordapp.com/attachments/1029266425862434846/1251637327239839876/63050ae9df594c789a0710ab02559837.jpg"
+
 
 def is_dst(currenttime):
     if currenttime > datetime.datetime(
@@ -19,6 +28,28 @@ def is_dst(currenttime):
         return True
     else:
         return False
+
+
+def get_prepub_ended_embed(last_datetime: datetime.datetime):
+    keyword = "waiting" if random.random() < 0.8 else "suffering"
+    embed = discord.Embed(
+        title="Myneday",
+        description=f"No Myneday in sight. We are {keyword} since <t:{int(last_datetime.timestamp())}:R>",
+        color=random.randint(0x0, 0xFFFFFF),
+    )
+    embed.set_image(url=prepub_ended_img)
+    return embed
+
+
+def get_myneday_embed(myne_time: datetime.datetime, is_myneday: bool):
+    timestamp = f"<t:{int(myne_time.timestamp())}:R>"
+    embed = discord.Embed(
+        title="Myneday",
+        description=f"Next prepub {timestamp} on {timestamp.replace(':R','')}.",
+        color=random.randint(0x0, 0xFFFFFF),
+    )
+    embed.set_image(url=random.choice(myneday_gifs) if is_myneday else not_myneday_gif)
+    return embed
 
 
 class Misc(commands.Cog, name="misc", description="Miscellaneous commands"):
@@ -159,40 +190,26 @@ class Misc(commands.Cog, name="misc", description="Miscellaneous commands"):
     async def mynetime(self, interaction: discord.Interaction):
         myne_hour = 16
         jnovel_tz = pytz.timezone("America/Chicago")
+        last_prepub_datetime = datetime.datetime(2024, 8, 5, myne_hour, tzinfo=jnovel_tz)
         jnovel_time = datetime.datetime.now(tz=jnovel_tz).replace(
             hour=myne_hour, minute=0, second=0, microsecond=0
         )
 
-        if jnovel_time.weekday() != 0 or jnovel_time.hour > myne_hour:
-            myne_time = jnovel_time + datetime.timedelta(days=7 - jnovel_time.weekday())
-            myne_time = jnovel_tz.localize(
-                datetime.datetime(
-                    myne_time.year, myne_time.month, myne_time.day, myne_hour
+        if jnovel_time > last_prepub_datetime:
+            embed = get_prepub_ended_embed(last_prepub_datetime)
+        else:
+            if jnovel_time.weekday() != 0 or jnovel_time.hour > myne_hour:
+                myne_time = jnovel_time + datetime.timedelta(days=7 - jnovel_time.weekday())
+                myne_time = jnovel_tz.localize(
+                    datetime.datetime(
+                        myne_time.year, myne_time.month, myne_time.day, myne_hour
+                    )
                 )
-            )
-        else:
-            myne_time = jnovel_time
+            else:
+                myne_time = jnovel_time
+            
+            embed = get_myneday_embed(myne_time, jnovel_time.weekday() == 0)
 
-        timestamp = f"<t:{int(myne_time.timestamp())}:R>"
-        embed = discord.Embed(
-            title="Myneday",
-            description=f"Next prepub {timestamp} on {timestamp.replace(':R','')}.",
-            color=random.randint(0x0, 0xFFFFFF),
-        )
-
-        myneday_gifs = (
-            "https://cdn.discordapp.com/attachments/1051224405688197130/1107797923753902150/ascendence-of-a-bookworm-bookworm-monday.gif",
-            "https://cdn.discordapp.com/attachments/1003970211692695642/1110114383708823572/Its_myneday.gif",
-            "https://cdn.discordapp.com/attachments/630607287660314634/1168523436331638784/giphy1.gif?ex=65521341&is=653f9e41&hm=93aad3ae52d7cab17d19dbb1e233028de553066039706aa8323a3641c38b02c0&",
-            "https://cdn.discordapp.com/attachments/1003970211692695642/1097360326317592667/giphy-1.gif",
-        )
-
-        if jnovel_time.weekday() == 0:
-            embed.set_image(url=random.choice(myneday_gifs))
-        else:
-            embed.set_image(
-                url="https://cdn.discordapp.com/attachments/1051224405688197130/1107797980179857499/ascendence-of-a-bookworm-bookworm-anime.gif"
-            )
         await interaction.response.send_message(embed=embed)
 
     # bless command, shows entry from database Usage: /bless
