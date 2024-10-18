@@ -16,7 +16,7 @@ myneday_gifs = (
     "https://cdn.discordapp.com/attachments/1003970211692695642/1097360326317592667/giphy-1.gif",
 )
 not_myneday_gif = "https://cdn.discordapp.com/attachments/1051224405688197130/1107797980179857499/ascendence-of-a-bookworm-bookworm-anime.gif"
-prepub_ended_img = "https://cdn.discordapp.com/attachments/1029266425862434846/1251637327239839876/63050ae9df594c789a0710ab02559837.jpg"
+prepub_ended_img = "https://cdn.discordapp.com/attachments/1029266425862434846/1287178582900215938/waiting2.png"
 
 
 def is_dst(currenttime):
@@ -59,7 +59,7 @@ class Misc(commands.Cog, name="misc", description="Miscellaneous commands"):
     @discord.app_commands.checks.cooldown(1, 30)
     async def dietlindetime(self, interaction: discord.Interaction):
         current_channel = f"{interaction.channel}"
-        if current_channel == f"pre-pub" or current_channel == f"Church Of Dietlinde":
+        if current_channel == "pre-pub" or current_channel == "Church Of Dietlinde":
             print(f"{interaction.user.id} tried and failed to use /dietlindetime")
             if interaction.user.id == int(519916455857487872):
                 tz_locale = pytz.timezone("America/Toronto")
@@ -119,7 +119,7 @@ class Misc(commands.Cog, name="misc", description="Miscellaneous commands"):
     @discord.app_commands.command(description="Get help from Mestionora", name="help")
     async def help_mestionora(self, interaction: discord.Interaction):
         current_channel = f"{interaction.channel}"
-        if current_channel == f"bots" or current_channel == f"🐍-bots":
+        if current_channel == "bots" or current_channel == "🐍-bots":
             with open("help_texts/scommands_help.txt") as shelp:
                 scommands = shelp.read()
 
@@ -171,11 +171,11 @@ class Misc(commands.Cog, name="misc", description="Miscellaneous commands"):
     @discord.app_commands.checks.cooldown(1, 30)
     async def hello(self, interaction: discord.Interaction):
         current_channel = f"{interaction.channel}"
-        if current_channel == f"bots" or current_channel == f"🐍-bot":
+        if current_channel == "bots" or current_channel == "🐍-bot":
             await interaction.response.send_message(
                 f"Hello {interaction.user.mention}!"
             )
-        elif current_channel == f"bot-development":
+        elif current_channel == "bot-development":
             await interaction.response.send_message(
                 f"Hello {interaction.user.mention}!"
             )
@@ -190,7 +190,8 @@ class Misc(commands.Cog, name="misc", description="Miscellaneous commands"):
     async def mynetime(self, interaction: discord.Interaction):
         myne_hour = 16
         jnovel_tz = pytz.timezone("America/Chicago")
-        last_prepub_datetime = datetime.datetime(2024, 8, 5, myne_hour, tzinfo=jnovel_tz)
+        # SSC2 prepub ends on December 23
+        last_prepub_datetime = datetime.datetime(2024, 12, 23, myne_hour, tzinfo=jnovel_tz)
         jnovel_time = datetime.datetime.now(tz=jnovel_tz).replace(
             hour=myne_hour, minute=0, second=0, microsecond=0
         )
@@ -218,8 +219,8 @@ class Misc(commands.Cog, name="misc", description="Miscellaneous commands"):
     @discord.app_commands.describe(id_num="The id of the quote you want to see.")
     async def bless(self, interaction: discord.Interaction, id_num: Optional[int]):
         current_channel = f"{interaction.channel}"
-        if current_channel == f"bots" or current_channel == f"🐍-bots":
-            if id_num == None:
+        if current_channel == "bots" or current_channel == "🐍-bots":
+            if id_num is None:
                 value = random.randint(1, 46)
                 c.execute(f"SELECT LINE from QUOTES where ID = '{value}'")
                 bless = c.fetchone()
@@ -239,7 +240,7 @@ class Misc(commands.Cog, name="misc", description="Miscellaneous commands"):
     @discord.app_commands.checks.cooldown(1, 30)
     async def praise(self, interaction: discord.Interaction):
         current_channel = f"{interaction.channel}"
-        if current_channel == f"bots" or current_channel == f"🐍-bots":
+        if current_channel == "bots" or current_channel == "🐍-bots":
             await interaction.response.send_message(
                 f"Blessings upon {interaction.user.mention}!"
             )
