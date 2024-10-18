@@ -190,7 +190,8 @@ class Misc(commands.Cog, name="misc", description="Miscellaneous commands"):
     async def mynetime(self, interaction: discord.Interaction):
         myne_hour = 16
         jnovel_tz = pytz.timezone("America/Chicago")
-        last_prepub_datetime = datetime.datetime(2024, 8, 5, myne_hour, tzinfo=jnovel_tz)
+        # SSC2 prepub ends on December 23
+        last_prepub_datetime = datetime.datetime(2024, 12, 23, myne_hour, tzinfo=jnovel_tz)
         jnovel_time = datetime.datetime.now(tz=jnovel_tz).replace(
             hour=myne_hour, minute=0, second=0, microsecond=0
         )
