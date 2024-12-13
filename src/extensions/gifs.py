@@ -1,4 +1,3 @@
-import random
 from typing import Optional
 
 import discord
@@ -6,6 +5,7 @@ from discord.ext import commands
 
 from src import c
 from src.constants import bot_channel_id
+from src.extensions.misc import is_bot_channel
 from src.utils import PageView
 
 
@@ -18,7 +18,7 @@ class Gifs(commands.Cog, name="gifs", description="Gif commands"):
 
         items = [
             f"{_gif[0]} • **{_gif[1]}** • [View Gif]({_gif[2]})"
-            for _gif in c.execute(f"SELECT id, name, gif FROM gif_table").fetchall()
+            for _gif in c.execute("SELECT id, name, gif FROM gif_table").fetchall()
         ]
 
         view = PageView(
@@ -42,9 +42,7 @@ class Gifs(commands.Cog, name="gifs", description="Gif commands"):
         name: Optional[str],
         id_num: Optional[int],
     ):
-        current_channel = f"{interaction.channel}"
-
-        if current_channel == "bots" or current_channel == "🐍-bots":
+        if is_bot_channel(interaction.channel):
             if name is not None and id_num is not None:
                 await interaction.response.send_message(
                     "You cannot use the gif name and gif id simultaneously.",

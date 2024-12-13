@@ -3,6 +3,7 @@ from discord.ext import commands
 import sqlalchemy as sa
 
 from src import Session
+from src.extensions.misc import is_bot_channel
 from src.models import Club, ClubMember
 
 
@@ -180,8 +181,7 @@ class Clubs(commands.GroupCog, name="club", description="Commands to manage club
 
     @discord.app_commands.command(description="List all clubs in a server", name="list")
     async def list_clubs(self, interaction: discord.Interaction):
-        current_channel = f"{interaction.channel}"
-        if current_channel == "bots" or current_channel == "🐍-bots":
+        if is_bot_channel(interaction.channel):
             if interaction.guild is None or interaction.channel is None:
                 return await interaction.response.send_message(
                     ephemeral=True,
