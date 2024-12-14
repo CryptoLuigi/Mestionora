@@ -52,6 +52,9 @@ def get_myneday_embed(myne_time: datetime.datetime, is_myneday: bool):
     return embed
 
 
+def is_bot_channel(channel: discord.ChannelType):
+    return  channel.id == bot_channel_id or str(channel) in ["bots", "🐍-bots"]
+
 class Misc(commands.Cog, name="misc", description="Miscellaneous commands"):
     pass
 
@@ -118,8 +121,7 @@ class Misc(commands.Cog, name="misc", description="Miscellaneous commands"):
     # Help command
     @discord.app_commands.command(description="Get help from Mestionora", name="help")
     async def help_mestionora(self, interaction: discord.Interaction):
-        current_channel = f"{interaction.channel}"
-        if current_channel == "bots" or current_channel == "🐍-bots":
+        if is_bot_channel(interaction.channel):
             with open("help_texts/scommands_help.txt") as shelp:
                 scommands = shelp.read()
 
@@ -149,8 +151,7 @@ class Misc(commands.Cog, name="misc", description="Miscellaneous commands"):
     @discord.app_commands.command(description="Fetch the list of bots on the server.")
     @discord.app_commands.checks.cooldown(1, 30)
     async def list_bots(self, interaction: discord.Interaction):
-        current_channel = f"{interaction.channel}"
-        if current_channel == "bots" or current_channel == "🐍-bot":
+        if is_bot_channel(interaction.channel):
             guild = interaction.guild
             assert guild is not None
             contentmsg = "This is the list of bots in the *Ascendance of a Bookworm* discord server:\n\n"
@@ -171,7 +172,7 @@ class Misc(commands.Cog, name="misc", description="Miscellaneous commands"):
     @discord.app_commands.checks.cooldown(1, 30)
     async def hello(self, interaction: discord.Interaction):
         current_channel = f"{interaction.channel}"
-        if current_channel == "bots" or current_channel == "🐍-bot":
+        if is_bot_channel(interaction.channel):
             await interaction.response.send_message(
                 f"Hello {interaction.user.mention}!"
             )
@@ -218,8 +219,7 @@ class Misc(commands.Cog, name="misc", description="Miscellaneous commands"):
     @discord.app_commands.command(description="Recieve a divine blessing")
     @discord.app_commands.describe(id_num="The id of the quote you want to see.")
     async def bless(self, interaction: discord.Interaction, id_num: Optional[int]):
-        current_channel = f"{interaction.channel}"
-        if current_channel == "bots" or current_channel == "🐍-bots":
+        if is_bot_channel(interaction.channel):
             if id_num is None:
                 value = random.randint(1, 46)
                 c.execute(f"SELECT LINE from QUOTES where ID = '{value}'")
@@ -239,8 +239,7 @@ class Misc(commands.Cog, name="misc", description="Miscellaneous commands"):
     @discord.app_commands.command(description="Praise be to the Gods!")
     @discord.app_commands.checks.cooldown(1, 30)
     async def praise(self, interaction: discord.Interaction):
-        current_channel = f"{interaction.channel}"
-        if current_channel == "bots" or current_channel == "🐍-bots":
+        if is_bot_channel(interaction.channel):
             await interaction.response.send_message(
                 f"Blessings upon {interaction.user.mention}!"
             )

@@ -13,6 +13,7 @@ from src.constants import (
     intro_channel_id,
     role_channel_id,
 )
+from src.extensions.misc import is_bot_channel
 
 
 class Events(commands.Cog, name="events"):
@@ -78,7 +79,7 @@ class Events(commands.Cog, name="events"):
         if (
             message.author == self._bot.user
             or not isinstance(message.channel, discord.TextChannel)
-            or not message.channel.name == "bots"
+            or not is_bot_channel(message.channel)
         ):
             return
 
