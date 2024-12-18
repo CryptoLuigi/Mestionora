@@ -51,7 +51,7 @@ class Events(commands.Cog, name="events"):
         if guild.id == bookworm_server_id:
             await self._bot.get_partial_messageable(welcome_channel_id).send(
                 MEMBER_JOIN_MESSAGE.format(
-                    user_name=member.name, intro_channel=intro_channel_id)
+                    username=member.name, intro_channel=intro_channel_id)
             )
 
     # Start up message
