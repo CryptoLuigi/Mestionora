@@ -11,9 +11,13 @@ from src.constants import (
     welcome_channel_id,
     chibi_server_id,
     intro_channel_id,
-    role_channel_id,
 )
 from src.extensions.misc import is_bot_channel
+
+
+MEMBER_JOIN_MESSAGE = ("Welcome **{username}** to **Ascendance of a Bookworm**! "
+                       "Feel free to introduce yourself in <#{intro_channel}> "
+                       "and customize your server experience through <id:customize> <:MyneSparkle:1018941182430154902>")
 
 
 class Events(commands.Cog, name="events"):
@@ -46,10 +50,8 @@ class Events(commands.Cog, name="events"):
 
         if guild.id == bookworm_server_id:
             await self._bot.get_partial_messageable(welcome_channel_id).send(
-                f"Welcome! {member.mention} welcome to **Ascendance of a Bookworm!** "
-                f"Be sure to check our <#{welcome_channel_id}>! "
-                f"Feel free to introduce yourself in <#{intro_channel_id}> "
-                f"and get a role in <#{role_channel_id}> <:MyneSparkle:1018941182430154902>"
+                MEMBER_JOIN_MESSAGE.format(
+                    username=member.name, intro_channel=intro_channel_id)
             )
 
     # Start up message
@@ -65,7 +67,8 @@ class Events(commands.Cog, name="events"):
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
         channel = self._bot.get_partial_messageable(payload.channel_id)
-        message = discord.PartialMessage(channel=channel, id=payload.message_id)
+        message = discord.PartialMessage(
+            channel=channel, id=payload.message_id)
 
         if self._bot.user is None or payload.user_id == self._bot.user.id:
             return
