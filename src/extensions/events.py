@@ -60,6 +60,7 @@ class Events(commands.Cog, name="events"):
         self,
     ):
         print("Mestionora lives")
+        await self._bot.tree.sync()
         d = datetime.datetime.today()
         w = calendar.day_name[d.weekday()]
         print("Mestionora wishes you a happy", w)
