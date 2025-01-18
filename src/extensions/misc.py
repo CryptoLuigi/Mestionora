@@ -41,10 +41,10 @@ def get_prepub_ended_embed(last_datetime: datetime.datetime):
     return embed
 
 
-def get_myneday_embed(myne_time: datetime.datetime, is_myneday: bool):
+def get_myneday_embed(myne_time: datetime.datetime, is_myneday: bool, title: str):
     timestamp = f"<t:{int(myne_time.timestamp())}:R>"
     embed = discord.Embed(
-        title="Myneday",
+        title=title,
         description=f"Next prepub {timestamp} on {timestamp.replace(':R','')}.",
         color=random.randint(0x0, 0xFFFFFF),
     )
@@ -186,13 +186,20 @@ class Misc(commands.Cog, name="misc", description="Miscellaneous commands"):
                 content=f"{interaction.user.mention} This can only be used in <#{bot_channel_id}>!",
             )
 
+    @discord.app_commands.command(description="Print time left for prepub")
+    async def hannetime(self, interaction: discord.Interaction):
+        await self.myneday_logic(interaction, title="Hannelore Day")
+
     # myneday command
     @discord.app_commands.command(description="Print time left for prepub")
     async def mynetime(self, interaction: discord.Interaction):
+        await self.myneday_logic(interaction, title="Myne Day")
+    
+    async def myneday_logic(self, interaction: discord.Interaction, title: str):
         myne_hour = 16
         jnovel_tz = pytz.timezone("America/Chicago")
-        # SSC2 prepub ends on December 23
-        last_prepub_datetime = datetime.datetime(2024, 12, 23, myne_hour, tzinfo=jnovel_tz)
+        # H5Y prepub ends on April 21, 2025
+        last_prepub_datetime = datetime.datetime(2025, 4, 21, myne_hour, tzinfo=jnovel_tz)
         jnovel_time = datetime.datetime.now(tz=jnovel_tz).replace(
             hour=myne_hour, minute=0, second=0, microsecond=0
         )
@@ -210,7 +217,7 @@ class Misc(commands.Cog, name="misc", description="Miscellaneous commands"):
             else:
                 myne_time = jnovel_time
             
-            embed = get_myneday_embed(myne_time, jnovel_time.weekday() == 0)
+            embed = get_myneday_embed(myne_time, jnovel_time.weekday() == 0, title=title)
 
         await interaction.response.send_message(embed=embed)
 
