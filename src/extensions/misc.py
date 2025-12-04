@@ -1,6 +1,7 @@
 import datetime
+import os
 import random
-from typing import Optional
+from typing import Literal, Optional
 
 import discord
 from discord.ext import commands
@@ -30,6 +31,59 @@ def is_dst(currenttime):
         return False
 
 
+MYNEDAY_TZ = pytz.timezone("America/Chicago")
+
+
+def load_prepub_dates(myne_hour=16):
+    start_raw = os.environ["MYNEDAY_START"]
+    end_raw = os.environ["MYNEDAY_END"]
+
+    # Parse simple YYYY-MM-DD
+    start_date = datetime.datetime.strptime(start_raw, "%Y-%m-%d").date()
+    end_date = datetime.datetime.strptime(end_raw, "%Y-%m-%d").date()
+
+    # Build full aware datetimes at the MYNE hour
+    start_dt = MYNEDAY_TZ.localize(
+        datetime.datetime(start_date.year, start_date.month, start_date.day, myne_hour)
+    )
+
+    end_dt = MYNEDAY_TZ.localize(
+        datetime.datetime(end_date.year, end_date.month, end_date.day, myne_hour)
+    )
+
+    return start_dt, end_dt
+
+
+def compute_myneday_state(
+    now: datetime.datetime, start_dt: datetime.datetime, end_dt: datetime.datetime
+) -> tuple[Literal["now", "scheduled", "ended"], datetime.datetime]:
+    myne_hour = 16
+
+    # Align "now" to the prepub release hour
+    jnow = now.astimezone(MYNEDAY_TZ).replace(
+        hour=myne_hour, minute=0, second=0, microsecond=0
+    )
+
+    # Case 1: prepub is over
+    if jnow > end_dt:
+        return "ended", end_dt
+
+    # Case 2: not started yet
+    if jnow < start_dt:
+        return "scheduled", start_dt
+
+    # Case 3: weekly schedule logic
+    if jnow.weekday() != 0:
+        next_date = jnow + datetime.timedelta(days=7 - jnow.weekday())
+        next_myne = MYNEDAY_TZ.localize(
+            datetime.datetime(next_date.year, next_date.month, next_date.day, myne_hour)
+        )
+        return "scheduled", next_myne
+
+    # Case 4: It’s myneday!
+    return "now", jnow
+
+
 def get_prepub_ended_embed(last_datetime: datetime.datetime):
     keyword = "waiting" if random.random() < 0.8 else "suffering"
     embed = discord.Embed(
@@ -45,7 +99,7 @@ def get_myneday_embed(myne_time: datetime.datetime, is_myneday: bool, title: str
     timestamp = f"<t:{int(myne_time.timestamp())}:R>"
     embed = discord.Embed(
         title=title,
-        description=f"Next prepub {timestamp} on {timestamp.replace(':R','')}.",
+        description=f"Next prepub {timestamp} on {timestamp.replace(':R', '')}.",
         color=random.randint(0x0, 0xFFFFFF),
     )
     embed.set_image(url=random.choice(myneday_gifs) if is_myneday else not_myneday_gif)
@@ -53,7 +107,8 @@ def get_myneday_embed(myne_time: datetime.datetime, is_myneday: bool, title: str
 
 
 def is_bot_channel(channel: discord.ChannelType):
-    return  channel.id == bot_channel_id or str(channel) in ["bots", "🐍-bots"]
+    return channel.id == bot_channel_id or str(channel) in ["bots", "🐍-bots"]
+
 
 class Misc(commands.Cog, name="misc", description="Miscellaneous commands"):
     pass
@@ -94,7 +149,7 @@ class Misc(commands.Cog, name="misc", description="Miscellaneous commands"):
                 timestamp = f"<t:{int(fixedtime.timestamp())}:R>"
                 embed = discord.Embed(
                     title="Detlinde Day",
-                    description=f"Next prepub {timestamp} on {timestamp.replace(':R','')}.",
+                    description=f"Next prepub {timestamp} on {timestamp.replace(':R', '')}.",
                     color=random.randint(0x0, 0xFFFFFF),
                 )
                 if weekday == 0:
@@ -194,30 +249,21 @@ class Misc(commands.Cog, name="misc", description="Miscellaneous commands"):
     @discord.app_commands.command(description="Print time left for prepub")
     async def mynetime(self, interaction: discord.Interaction):
         await self.myneday_logic(interaction, title="Myne Day")
-    
+
     async def myneday_logic(self, interaction: discord.Interaction, title: str):
-        myne_hour = 16
-        jnovel_tz = pytz.timezone("America/Chicago")
-        # H5Y prepub ends on April 21, 2025
-        last_prepub_datetime = datetime.datetime(2025, 4, 21, myne_hour, tzinfo=jnovel_tz)
-        jnovel_time = datetime.datetime.now(tz=jnovel_tz).replace(
-            hour=myne_hour, minute=0, second=0, microsecond=0
+        first_prepub_dt, last_prepub_dt = load_prepub_dates()
+        state, mynetime = compute_myneday_state(
+            datetime.datetime.now().astimezone(MYNEDAY_TZ),
+            first_prepub_dt,
+            last_prepub_dt,
         )
 
-        if jnovel_time > last_prepub_datetime:
-            embed = get_prepub_ended_embed(last_prepub_datetime)
-        else:
-            if jnovel_time.weekday() != 0 or jnovel_time.hour > myne_hour:
-                myne_time = jnovel_time + datetime.timedelta(days=7 - jnovel_time.weekday())
-                myne_time = jnovel_tz.localize(
-                    datetime.datetime(
-                        myne_time.year, myne_time.month, myne_time.day, myne_hour
-                    )
-                )
-            else:
-                myne_time = jnovel_time
-            
-            embed = get_myneday_embed(myne_time, jnovel_time.weekday() == 0, title=title)
+        if state == "ended":
+            embed = get_prepub_ended_embed(mynetime)
+        elif state == "scheduled":
+            embed = get_myneday_embed(mynetime, False, title)
+        else:  # NOW!!!
+            embed = get_myneday_embed(mynetime, True, title)
 
         await interaction.response.send_message(embed=embed)
 

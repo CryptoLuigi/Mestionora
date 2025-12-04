@@ -10,6 +10,7 @@ pytz = "*"
 sqlalchemy = "*"
 
 [dev-packages]
+pytest = "==9.0.1"
 
 [requires]
 python_version = "3.11"
