@@ -19,6 +19,11 @@ MEMBER_JOIN_MESSAGE = ("Welcome **{username}** to **Ascendance of a Bookworm**! 
                        "Feel free to introduce yourself in <#{intro_channel}> "
                        "and customize your server experience through <id:customize> <:MyneSparkle:1018941182430154902>")
 
+MEMBER_BOOST_MESSAGE = ("Thank you for boosting the server {mention}, be sure to claim your "
+                        "**[custom role](https://discord.com/channels/630606651992309760/"
+                        "1500187375865823242/1500188499804946564)**! "
+                        "<:Myne_bliss:696155170333130782>")
+
 
 class Events(commands.Cog, name="events"):
 
@@ -53,6 +58,19 @@ class Events(commands.Cog, name="events"):
                 MEMBER_JOIN_MESSAGE.format(
                     username=member.name, intro_channel=intro_channel_id)
             )
+
+    # Message on server boost
+    @commands.Cog.listener()
+    async def on_member_update(self, before: discord.Member, after: discord.Member):
+        if after.guild.id != bookworm_server_id:
+            return
+
+        if before.premium_since is not None or after.premium_since is None:
+            return
+
+        await self._bot.get_partial_messageable(welcome_channel_id).send(
+            MEMBER_BOOST_MESSAGE.format(mention=after.mention)
+        )
 
     # Start up message
     @commands.Cog.listener()
